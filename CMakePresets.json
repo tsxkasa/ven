@@ -1,0 +1,122 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "x64-Debug",
+      "displayName": "x64-Debug",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/x64-Debug",
+      "cacheVariables": {
+        "CUSTOM_COMPILE_FLAGS": "-Zi;-Od;-DDEBUG;-RTC1;-MDd;-W4"
+      },
+      "environment": {}
+    },
+    {
+      "name": "x64-Release",
+      "displayName": "x64-Release",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/x64-Release",
+      "cacheVariables": {
+        "CUSTOM_COMPILE_FLAGS": "-O2;-DNDEBUG;-GL;-MD;-W4"
+      },
+      "environment": {}
+    },
+    {
+      "name": "x64-Clang-Debug",
+      "displayName": "x64-Clang-Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/x64-Clang-Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer"
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
+      }
+    },
+    {
+      "name": "x64-Clang-Release",
+      "displayName": "x64-Clang-Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/x64-Clang-Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra"
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
+      }
+    },
+    {
+        "name": "Linux-GCC-Release",
+        "displayName": "Linux-GCC-Release",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build/Linux-GCC-Release",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Release",
+            "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra"
+        },
+        "environment": {}
+    },
+    {
+        "name": "Linux-GCC-Debug",
+        "displayName": "Linux-GCC-Debug",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build/Linux-GCC-Debug",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer"
+        },
+        "environment": {}
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-Debug",
+      "configurePreset": "x64-Debug",
+      "configuration": "Debug",
+      "jobs": 8
+    },
+    {
+      "name": "x64-Release",
+      "configurePreset": "x64-Release",
+      "configuration": "Release",
+      "jobs": 8
+    },
+    {
+      "name": "x64-Clang-Debug",
+      "configurePreset": "x64-Clang-Debug",
+      "configuration": "Debug",
+      "jobs": 8
+    },
+    {
+      "name": "x64-Clang-Release",
+      "configurePreset": "x64-Clang-Release",
+      "configuration": "Release",
+      "jobs": 8
+    },
+    {
+      "name": "Linux-GCC-Release",
+      "configurePreset": "Linux-GCC-Release",
+      "configuration": "Release",
+      "jobs": 8
+    },
+    {
+      "name": "Linux-GCC-Debug",
+      "configurePreset": "Linux-GCC-Debug",
+      "configuration": "Debug",
+      "jobs": 8
+    }
+  ]
+}
