@@ -39,14 +39,17 @@ target_sources(graviballs
 
 # Packages dependencies for project
 
-find_package(Vulkan REQUIRED) # requires Vulkan SDK on global path
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
 target_link_libraries(graviballs
     PRIVATE
-        Vulkan::Vulkan
+        glad::glad
+        glm::glm
         glfw
         spdlog::spdlog
 )
