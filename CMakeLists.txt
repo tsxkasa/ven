@@ -9,8 +9,8 @@ set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(PCH_FILE_H ${PROJECT_ROOT_DIR}/include/pch.h)
 
 set(PROJECT_INCLUDE_DIR
-    "${VULKAN_SDK}/Include"
     "${PROJECT_ROOT_DIR}/include"
+    "${PROJECT_ROOT_DIR}/include/ball"
 )
 
 set(LOG_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/logs)
@@ -50,6 +50,7 @@ target_link_libraries(graviballs
     PRIVATE
         glad::glad
         glm::glm
+        fmt::fmt
         glfw
         spdlog::spdlog
 )

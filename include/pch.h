@@ -33,14 +33,18 @@
 #include <stack>
 #include <expected>
 
-#include <fmt/fmt.h>
+#include <fmt/format.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-#include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <stb_image.h>
 #ifdef WIN32
 #include "Windows.h"
 #elif (UNIX)
 #include "unistd.h"
 #endif
+
+#include "color.h"

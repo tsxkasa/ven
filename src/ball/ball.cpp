@@ -1,9 +1,9 @@
 #include "ball.h"
 
-Ball::Ball(float radius, std::string ballname, double g, glm::vec2 position,
-           int segments)
+Ball::Ball(float radius, int segments, std::string ballname, double g,
+           glm::vec2 position, Color color)
     : radius(radius), name(ballname), gravity(g), position(position), VAO(0),
-      VBO(0), vertex_count(segments + 2) {
+      VBO(0), vertex_count(segments + 2), color(color) {
   setupMesh();
 }
 
@@ -11,6 +11,7 @@ Ball::~Ball() {
   glDeleteBuffers(1, &VBO);
   glDeleteVertexArrays(1, &VAO);
 }
+
 void Ball::setupMesh() {
   std::vector<float> vertices;
 
@@ -42,5 +43,31 @@ void Ball::setupMesh() {
 
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glBindVertexArray(0);
+  glBindVertexArray(0); // unbinds
+}
+
+void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
+                const glm::mat4 &view) {
+  glUseProgram(shaderProgram);
+
+  // pass model matrix, translate ball to current position
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+  unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+  // pass view matrix
+  unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+  // pass projection matrix
+  unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+  glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+  glBindVertexArray(VAO);
+  glDrawArrays(GL_TRIANGLE_FAN, 1, vertex_count);
+  glBindVertexArray(0); // unbinds
+}
+
+void Ball::transform(glm::vec2 delta) {
+  (void)delta; // suppress warning placeholder
 }
