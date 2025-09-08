@@ -1,9 +1,9 @@
 #include "ball.h"
 
 Ball::Ball(float radius, int segments, std::string ballname, glm::vec2 position,
-           Color color, double g)
+           Color color, glm::vec2 g)
     : radius(radius), name(ballname), gravity(g), position(position), VAO(0),
-      VBO(0), vertex_count(segments + 2), color(color) {
+      VBO(0), vertex_count(segments + 2), velocity(0), color(color) {
   setupMesh();
 }
 
@@ -74,6 +74,10 @@ void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
   glBindVertexArray(0); // unbinds
 }
 
-void Ball::transform(glm::vec2 delta) {
-  position += delta;
+void Ball::transform(float delta) {
+  velocity += gravity * delta;  // v = v + at
+  position += velocity * delta; // p = p + vt
+  if (position.y > 1080.0f) {
+    position.y = 0;
+  }
 }

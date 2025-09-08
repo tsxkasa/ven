@@ -7,7 +7,8 @@ class Ball {
 private:
   float radius;
   std::string name;
-  double gravity;
+  glm::vec2 velocity;
+  glm::vec2 gravity;
   glm::vec2 position;
 
   unsigned int VAO, VBO;
@@ -30,7 +31,7 @@ public:
   */
   Ball(float radius, int segments, std::string ballname,
        glm::vec2 position = {0.0f, 0.0f},
-       Color color = {1.0f, 1.0f, 1.0f, 1.0f}, double g = 9.80665);
+       Color color = {1.0f, 1.0f, 1.0f, 1.0f}, glm::vec2 g = {0, 9.80665});
   ~Ball();
 
   /**
@@ -45,7 +46,7 @@ public:
 
   /**
    * Transform the ball Δ pixel from center
-   * @param {delta} Δpos in pixel
+   * @param {delta} delta time
    */
-  void transform(glm::vec2 delta);
+  void transform(float delta);
 };

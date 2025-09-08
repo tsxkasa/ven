@@ -55,7 +55,7 @@ int main() {
       glm::ortho(0.0f, (float)vmode->width, (float)vmode->height, 0.0f);
   glm::mat4 view = glm::mat4(1.0f);
 
-  Ball ball(50.0f, 50, "Ball", glm::vec2(100.0f, 100.0f));
+  Ball ball = Ball(50.0f, 50, "Ball", glm::vec2(100.0f, 100.0f));
 
   // Framerate count variables
   double previous_time = glfwGetTime();
@@ -64,6 +64,7 @@ int main() {
 
   // ---- Main draw loop ----
   while (!glfwWindowShouldClose(window)) {
+
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_NewFrame();
@@ -86,12 +87,12 @@ int main() {
 
     ImGui::Render();
     ball.draw(shaderProgram, projection, view);
-    ball.transform(glm::vec2(0.0f, 1.0f));
+    ball.transform(delta_time);
 
     glViewport(0, 0, vmode->width, vmode->height);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     // V-Sync
-    glfwSwapInterval(1);
+    // glfwSwapInterval(1);
     
     glfwSwapBuffers(window);
     glfwPollEvents();
