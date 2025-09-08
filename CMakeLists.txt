@@ -12,6 +12,7 @@ set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include"
     "${PROJECT_ROOT_DIR}/include/ball"
     "${PROJECT_ROOT_DIR}/include/utils"
+    "${PROJECT_ROOT_DIR}/include/ui"
 )
 
 set(LOG_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/logs)
@@ -28,6 +29,7 @@ set(COMMON_SOURCE_FILES
     ${PCH_FILE_CPP}
     "${PROJECT_ROOT_DIR}/src/ball/ball.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/shadercompile.cpp"
+    "${PROJECT_ROOT_DIR}/src/ui/ui_main.cpp"
 )
 
 # ------------- COMPILES ---------------
@@ -48,6 +50,7 @@ find_package(glad CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(Stb REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 target_link_libraries(graviballs
     PRIVATE
@@ -56,6 +59,7 @@ target_link_libraries(graviballs
         fmt::fmt
         glfw
         spdlog::spdlog
+        imgui::imgui
 )
 
 # Set output directory for the executable
