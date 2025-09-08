@@ -75,5 +75,5 @@ void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
 }
 
 void Ball::transform(glm::vec2 delta) {
-  (void)delta; // suppress warning placeholder
+  position += delta;
 }

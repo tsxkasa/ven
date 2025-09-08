@@ -57,6 +57,11 @@ int main() {
 
   Ball ball(50.0f, 50, "Ball", glm::vec2(100.0f, 100.0f));
 
+  // Framerate count variables
+  double previous_time = glfwGetTime();
+  long frame_count = 0;
+  double fps = 0.0;
+
   // ---- Main draw loop ----
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -69,12 +74,25 @@ int main() {
       break;
     }
 
+    double current_time = glfwGetTime();
+    double delta_time = current_time - previous_time;
+    frame_count++;
+    if (frame_count > 100) {
+      fps = 1.0 / double(delta_time);
+      frame_count = 0;
+    }
+    gui::render::framerate(fps);
+    previous_time = current_time;
+
     ImGui::Render();
     ball.draw(shaderProgram, projection, view);
+    ball.transform(glm::vec2(0.0f, 1.0f));
 
     glViewport(0, 0, vmode->width, vmode->height);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+    // V-Sync
+    glfwSwapInterval(1);
+    
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
