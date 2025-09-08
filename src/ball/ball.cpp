@@ -1,7 +1,7 @@
 #include "ball.h"
 
-Ball::Ball(float radius, int segments, std::string ballname, double g,
-           glm::vec2 position, Color color)
+Ball::Ball(float radius, int segments, std::string ballname, glm::vec2 position,
+           Color color, double g)
     : radius(radius), name(ballname), gravity(g), position(position), VAO(0),
       VBO(0), vertex_count(segments + 2), color(color) {
   setupMesh();
@@ -22,7 +22,7 @@ void Ball::setupMesh() {
   // 2π / segments
   float angle_step = (2.0f * glm::pi<float>()) / (vertex_count - 2);
 
-  for (int i = 0; i < vertex_count - 2; i++) {
+  for (int i = 0; i <= vertex_count - 1; i++) {
     float angle = angle_step * i;
     float x = position.x + radius * cos(angle);
     float y = position.y + radius * sin(angle);
@@ -60,11 +60,17 @@ void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
   // pass projection matrix
-  unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+  unsigned int projectionLoc =
+      glGetUniformLocation(shaderProgram, "projection");
   glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+  // pass colors
+  glm::vec4 colors{color.r, color.g, color.b, color.a};
+  unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
+  glUniform4fv(colorLoc, 1, glm::value_ptr(colors));
+
   glBindVertexArray(VAO);
-  glDrawArrays(GL_TRIANGLE_FAN, 1, vertex_count);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, vertex_count);
   glBindVertexArray(0); // unbinds
 }
 

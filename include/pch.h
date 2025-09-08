@@ -41,6 +41,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <spdlog/common.h>
 #ifdef WIN32
 #include "Windows.h"
 #elif (UNIX)
