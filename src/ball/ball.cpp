@@ -15,17 +15,17 @@ Ball::~Ball() {
 void Ball::setupMesh() {
   std::vector<float> vertices;
 
-  // Center (initial) of the ball
-  vertices.push_back(position.x);
-  vertices.push_back(position.y);
+  // Center of the ball (0, 0) because it's relative to the shape drawn
+  vertices.push_back(0.0f);
+  vertices.push_back(0.0f);
 
   // 2π / segments
   float angle_step = (2.0f * glm::pi<float>()) / (vertex_count - 2);
 
   for (int i = 0; i <= vertex_count - 1; i++) {
     float angle = angle_step * i;
-    float x = position.x + radius * cos(angle);
-    float y = position.y + radius * sin(angle);
+    float x = radius * cos(angle);
+    float y = radius * sin(angle);
     vertices.push_back(x);
     vertices.push_back(y);
   }
@@ -77,7 +77,9 @@ void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
 void Ball::transform(float delta) {
   velocity += gravity * delta;  // v = v + at
   position += velocity * delta; // p = p + vt
-  if (position.y > 1080.0f) {
+  if (position.y + (2 * radius) > 1080.0f) {
+    velocity = {0.0f, 0.0f};
+    gravity = {0.0f, 0.0f};
     position.y = 0;
   }
 }

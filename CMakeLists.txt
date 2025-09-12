@@ -29,6 +29,7 @@ set(COMMON_SOURCE_FILES
     ${PCH_FILE_CPP}
     "${PROJECT_ROOT_DIR}/src/ball/ball.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/shadercompile.cpp"
+    "${PROJECT_ROOT_DIR}/src/utils/mouse.cpp"
     "${PROJECT_ROOT_DIR}/src/ui/ui_main.cpp"
 )
 

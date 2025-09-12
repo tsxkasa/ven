@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "shadercompile.h"
 #include "ui_main.h"
+#include "mouse.h"
 
 int main() {
   GLFWwindow *window;
@@ -85,6 +86,10 @@ int main() {
     gui::render::framerate(fps);
     previous_time = current_time;
 
+    mouse::State mouse;
+    glfwGetCursorPos(window, &mouse.x, &mouse.y);
+    gui::render::cursor_pos(mouse.x, mouse.y);
+
     ImGui::Render();
     ball.draw(shaderProgram, projection, view);
     ball.transform(delta_time);
@@ -92,8 +97,8 @@ int main() {
     glViewport(0, 0, vmode->width, vmode->height);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     // V-Sync
-    // glfwSwapInterval(1);
-    
+    glfwSwapInterval(1);
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }

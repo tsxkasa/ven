@@ -31,3 +31,17 @@ void gui::render::framerate(double fps) {
   ImGui::Text("FPS: %.2f", fps);
   ImGui::End();
 }
+
+void gui::render::cursor_pos(double x, double y) {
+  ImVec2 windowPos = ImVec2(1700.0f, 400.0f);
+  ImVec2 windowSize = ImVec2(300.0f, 300.0f);
+  ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+  ImGui::Begin("##cursor", nullptr,
+               ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                   ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground |
+                   ImGuiWindowFlags_NoScrollbar);
+
+  ImGui::Text("Cursor: (%.2f, %.2f)", x, y);
+  ImGui::End();
+}
