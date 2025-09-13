@@ -45,3 +45,17 @@ void gui::render::cursor_pos(double x, double y) {
   ImGui::Text("Cursor: (%.2f, %.2f)", x, y);
   ImGui::End();
 }
+
+void gui::render::object_amt(int object_amt) {
+  ImVec2 windowPos = ImVec2(1700.0f, 300.0f);
+  ImVec2 windowSize = ImVec2(300.0f, 300.0f);
+  ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+  ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+  ImGui::Begin("##objects", nullptr,
+               ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                   ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground |
+                   ImGuiWindowFlags_NoScrollbar);
+
+  ImGui::Text("Amount: %d", object_amt);
+  ImGui::End();
+}

@@ -74,12 +74,11 @@ void Ball::draw(unsigned int shaderProgram, const glm::mat4 &projection,
   glBindVertexArray(0); // unbinds
 }
 
-void Ball::transform(float delta) {
+bool Ball::transform(float delta) {
   velocity += gravity * delta;  // v = v + at
   position += velocity * delta; // p = p + vt
   if (position.y + (2 * radius) > 1080.0f) {
-    velocity = {0.0f, 0.0f};
-    gravity = {0.0f, 0.0f};
-    position.y = 0;
+    return false;
   }
+  return true;
 }

@@ -1,8 +1,8 @@
 #include "ball.h"
+#include "mouse.h"
 #include "pch.h"
 #include "shadercompile.h"
 #include "ui_main.h"
-#include "mouse.h"
 
 int main() {
   GLFWwindow *window;
@@ -56,7 +56,7 @@ int main() {
       glm::ortho(0.0f, (float)vmode->width, (float)vmode->height, 0.0f);
   glm::mat4 view = glm::mat4(1.0f);
 
-  Ball ball = Ball(50.0f, 50, "Ball", glm::vec2(100.0f, 100.0f));
+  std::vector<std::unique_ptr<Ball>> balls;
 
   // Framerate count variables
   double previous_time = glfwGetTime();
@@ -89,15 +89,30 @@ int main() {
     mouse::State mouse;
     glfwGetCursorPos(window, &mouse.x, &mouse.y);
     gui::render::cursor_pos(mouse.x, mouse.y);
+    gui::render::object_amt(balls.size());
 
     ImGui::Render();
-    ball.draw(shaderProgram, projection, view);
-    ball.transform(delta_time);
+    for (auto &ball : balls) {
+      ball->draw(shaderProgram, projection, view);
+      ball->transform(delta_time);
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+      balls.push_back(
+          std::make_unique<Ball>(20, 25, "Ball " + std::to_string(balls.size()),
+                                 glm::vec2{mouse.x, mouse.y}));
+    }
+
+    balls.erase(std::remove_if(balls.begin(), balls.end(),
+                               [&delta_time](auto &b) -> bool {
+                                 return !b->transform(delta_time);
+                               }),
+                balls.end());
 
     glViewport(0, 0, vmode->width, vmode->height);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     // V-Sync
-    glfwSwapInterval(1);
+    // glfwSwapInterval(1);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

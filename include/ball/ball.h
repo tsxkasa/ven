@@ -48,5 +48,5 @@ public:
    * Transform the ball Δ pixel from center
    * @param {delta} delta time
    */
-  void transform(float delta);
+  bool transform(float delta);
 };
