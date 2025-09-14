@@ -13,8 +13,8 @@ set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include/entities"
     "${PROJECT_ROOT_DIR}/include/utils"
     "${PROJECT_ROOT_DIR}/include/ui"
-    "${PROJECT_ROOT_DIR}/include/systems"
-    "${PROJECT_ROOT_DIR}/include/components"
+    "${PROJECT_ROOT_DIR}/include/ecs/systems"
+    "${PROJECT_ROOT_DIR}/include/ecs/components"
     "${PROJECT_ROOT_DIR}/include/ecs"
 )
 
@@ -27,16 +27,24 @@ file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_DIR})
 set(MAIN_CPP_FILE ${PROJECT_ROOT_DIR}/src/main.cpp)
 set(PCH_FILE_CPP ${PROJECT_ROOT_DIR}/src/pch.cpp)
 
+set(ECS_SYSTEM_SOURCES
+    "${PROJECT_ROOT_DIR}/src/ecs/systems/renderer.cpp"
+    "${PROJECT_ROOT_DIR}/src/ecs/systems/physics.cpp"
+)
+
+set(ECS_ENTITY_SOURCES
+    "${PROJECT_ROOT_DIR}/src/ecs/entities/ball.cpp"
+)
+
 set(COMMON_SOURCE_FILES
     ${MAIN_CPP_FILE}
     ${PCH_FILE_CPP}
-    "${PROJECT_ROOT_DIR}/src/entities/ball.cpp"
+    ${ECS_SYSTEM_SOURCES}
+    ${ECS_ENTITY_SOURCES}
+    "${PROJECT_ROOT_DIR}/src/ecs/ecs.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/shadercompile.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/mouse.cpp"
     "${PROJECT_ROOT_DIR}/src/ui/ui_main.cpp"
-    "${PROJECT_ROOT_DIR}/src/systems/renderer.cpp"
-    "${PROJECT_ROOT_DIR}/src/systems/physics.cpp"
-    "${PROJECT_ROOT_DIR}/src/ecs/ecs.cpp"
 )
 
 # ------------- COMPILES ---------------
