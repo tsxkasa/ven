@@ -52,3 +52,5 @@
 #endif
 
 #include "color.h"
+
+using Entity = std::uint32_t;

@@ -1,4 +1,4 @@
-#include "ball.h"
+#include "ecs.h"
 #include "mouse.h"
 #include "pch.h"
 #include "shadercompile.h"
@@ -56,7 +56,14 @@ int main() {
       glm::ortho(0.0f, (float)vmode->width, (float)vmode->height, 0.0f);
   glm::mat4 view = glm::mat4(1.0f);
 
-  std::vector<std::unique_ptr<Ball>> balls;
+  std::vector<Entity> entities;
+
+  ecs::management::ResourceControl global_resource{shaderProgram, projection,
+                                                   view};
+
+  mouse::State last_mouse_pos;
+  float time_since_last_spawn = 0.0f;
+  const float spawn_cd = 0.01f;
 
   // Framerate count variables
   double previous_time = glfwGetTime();
@@ -89,25 +96,40 @@ int main() {
     mouse::State mouse;
     glfwGetCursorPos(window, &mouse.x, &mouse.y);
     gui::render::cursor_pos(mouse.x, mouse.y);
-    gui::render::object_amt(balls.size());
+    gui::render::object_amt(entities.size());
+    gui::render::clear_obj(global_resource);
+
+    float distance_moved =
+        glm::distance(glm::vec2{mouse.x, mouse.y},
+                      glm::vec2{last_mouse_pos.x, last_mouse_pos.y});
 
     ImGui::Render();
-    for (auto &ball : balls) {
-      ball->draw(shaderProgram, projection, view);
-      ball->transform(delta_time);
-    }
+
+    auto delete_entities = global_resource.update(delta_time, *vmode);
+
+    std::erase_if(entities, [&](Entity e) {
+      return std::find(delete_entities.begin(), delete_entities.end(), e) !=
+             delete_entities.end();
+    });
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-      balls.push_back(
-          std::make_unique<Ball>(20, 25, "Ball " + std::to_string(balls.size()),
-                                 glm::vec2{mouse.x, mouse.y}));
+      if (glfwGetTime() - time_since_last_spawn > spawn_cd) {
+        if (distance_moved < 0.5f) {
+          Entity e = ecs::ent::createBall(
+              global_resource.transforms, global_resource.physics,
+              global_resource.renderables, 20, 25, glm::vec2{mouse.x, mouse.y});
+          entities.push_back(e);
+          time_since_last_spawn = glfwGetTime();
+        } else if (distance_moved > 0.75f) {
+          Entity e = ecs::ent::createBall(
+              global_resource.transforms, global_resource.physics,
+              global_resource.renderables, 20, 25, glm::vec2{mouse.x, mouse.y});
+          entities.push_back(e);
+        }
+      }
     }
 
-    balls.erase(std::remove_if(balls.begin(), balls.end(),
-                               [&delta_time](auto &b) -> bool {
-                                 return !b->transform(delta_time);
-                               }),
-                balls.end());
+    last_mouse_pos = mouse;
 
     glViewport(0, 0, vmode->width, vmode->height);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

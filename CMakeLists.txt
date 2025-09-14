@@ -10,9 +10,12 @@ set(PCH_FILE_H ${PROJECT_ROOT_DIR}/include/pch.h)
 
 set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include"
-    "${PROJECT_ROOT_DIR}/include/ball"
+    "${PROJECT_ROOT_DIR}/include/entities"
     "${PROJECT_ROOT_DIR}/include/utils"
     "${PROJECT_ROOT_DIR}/include/ui"
+    "${PROJECT_ROOT_DIR}/include/systems"
+    "${PROJECT_ROOT_DIR}/include/components"
+    "${PROJECT_ROOT_DIR}/include/ecs"
 )
 
 set(LOG_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/logs)
@@ -27,10 +30,13 @@ set(PCH_FILE_CPP ${PROJECT_ROOT_DIR}/src/pch.cpp)
 set(COMMON_SOURCE_FILES
     ${MAIN_CPP_FILE}
     ${PCH_FILE_CPP}
-    "${PROJECT_ROOT_DIR}/src/ball/ball.cpp"
+    "${PROJECT_ROOT_DIR}/src/entities/ball.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/shadercompile.cpp"
     "${PROJECT_ROOT_DIR}/src/utils/mouse.cpp"
     "${PROJECT_ROOT_DIR}/src/ui/ui_main.cpp"
+    "${PROJECT_ROOT_DIR}/src/systems/renderer.cpp"
+    "${PROJECT_ROOT_DIR}/src/systems/physics.cpp"
+    "${PROJECT_ROOT_DIR}/src/ecs/ecs.cpp"
 )
 
 # ------------- COMPILES ---------------
