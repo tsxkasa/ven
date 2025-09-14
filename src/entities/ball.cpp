@@ -12,7 +12,7 @@ Entity ecs::ent::createBall(std::unordered_map<Entity, ecs::comp::Transform> &tr
   transforms[entity] = {
       position,     // pos
       {0.0f, 0.0f}, // rotation
-      radius        // use radius as scale
+      1.0f        // use radius as scale
   };
 
   // Physics

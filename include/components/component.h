@@ -2,6 +2,7 @@
 
 #include "color.h"
 #include "pch.h"
+#include "mesh.h"
 
 namespace ecs {
 namespace comp {

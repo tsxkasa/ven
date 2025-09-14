@@ -56,8 +56,6 @@ int main() {
       glm::ortho(0.0f, (float)vmode->width, (float)vmode->height, 0.0f);
   glm::mat4 view = glm::mat4(1.0f);
 
-  std::vector<Entity> entities;
-
   ecs::management::ResourceControl global_resource{shaderProgram, projection,
                                                    view};
 
@@ -96,7 +94,7 @@ int main() {
     mouse::State mouse;
     glfwGetCursorPos(window, &mouse.x, &mouse.y);
     gui::render::cursor_pos(mouse.x, mouse.y);
-    gui::render::object_amt(entities.size());
+    gui::render::object_amt(global_resource.entity_amount());
     gui::render::clear_obj(global_resource);
 
     float distance_moved =
@@ -107,7 +105,7 @@ int main() {
 
     auto delete_entities = global_resource.update(delta_time, *vmode);
 
-    std::erase_if(entities, [&](Entity e) {
+    std::erase_if(global_resource.get_entity(), [&](Entity e) {
       return std::find(delete_entities.begin(), delete_entities.end(), e) !=
              delete_entities.end();
     });
@@ -115,16 +113,18 @@ int main() {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
       if (glfwGetTime() - time_since_last_spawn > spawn_cd) {
         if (distance_moved < 0.5f) {
-          Entity e = ecs::ent::createBall(
-              global_resource.transforms, global_resource.physics,
-              global_resource.renderables, 20, 25, glm::vec2{mouse.x, mouse.y});
-          entities.push_back(e);
+          Entity e = ecs::ent::createBall(global_resource.get_transforms(),
+                                          global_resource.get_physics(),
+                                          global_resource.get_renderables(), 20,
+                                          25, glm::vec2{mouse.x, mouse.y});
+          global_resource.add_entity(e);
           time_since_last_spawn = glfwGetTime();
         } else if (distance_moved > 0.75f) {
-          Entity e = ecs::ent::createBall(
-              global_resource.transforms, global_resource.physics,
-              global_resource.renderables, 20, 25, glm::vec2{mouse.x, mouse.y});
-          entities.push_back(e);
+          Entity e = ecs::ent::createBall(global_resource.get_transforms(),
+                                          global_resource.get_physics(),
+                                          global_resource.get_renderables(), 20,
+                                          25, glm::vec2{mouse.x, mouse.y});
+          global_resource.add_entity(e);
         }
       }
     }

@@ -61,7 +61,4 @@ void ecs::sys::Render::draw(
     glDrawArrays(GL_TRIANGLE_FAN, 0, r.vertex_count);
     glBindVertexArray(0);
   }
-
-  // Unbind shader
-  glUseProgram(0);
 }
