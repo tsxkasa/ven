@@ -12,7 +12,7 @@ Entity ecs::ent::createBall(std::unordered_map<Entity, ecs::comp::Transform> &tr
   transforms[entity] = {
       position,     // pos
       {0.0f, 0.0f}, // rotation
-      1.0f        // use radius as scale
+      radius        // use radius as scale
   };
 
   // Physics
@@ -36,8 +36,9 @@ Entity ecs::ent::createBall(std::unordered_map<Entity, ecs::comp::Transform> &tr
 
   for (int i = 0; i <= render.vertex_count - 1; i++) {
     float angle = angle_step * i;
-    float x = radius * cos(angle);
-    float y = radius * sin(angle);
+    // unit circle
+    float x = cos(angle);
+    float y = sin(angle);
     vertices.push_back(x);
     vertices.push_back(y);
   }
