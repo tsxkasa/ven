@@ -1,4 +1,6 @@
 out/
 build/
 .vscode/
+.vs/
+*.spv
 *.ini

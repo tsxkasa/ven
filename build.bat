@@ -1,8 +1,6 @@
 @echo off
 setlocal
 
-set "VCPKG_TOOLCHAIN=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake"
-
 if "%~1"=="" (
     echo No build preset provided.
     echo Usage: build.bat [clangdeb^|clangrel^|cldeb^|clrel]
@@ -51,7 +49,7 @@ if /i "%~2"=="clean" (
 
 set "SOURCE_DIR=."
 
-set "LOG_DIR=build\logs"
+set "LOG_DIR=logs"
 set "LOG_FILE=%LOG_DIR%\build_log.txt"
 
 echo --- Starting CMake Configuration and Build ---
@@ -69,7 +67,7 @@ if not exist "%LOG_DIR%" (
 
 echo --- Configuring CMake ---
 echo --- Configuring CMake --- >> "%LOG_FILE%" 2>&1
-cmake . -DCMAKE_TOOLCHAIN_FILE="%VCPKG_TOOLCHAIN%" --preset %PRESET% >> "%LOG_FILE%" 2>&1
+cmake . --preset %PRESET% >> "%LOG_FILE%" 2>&1
 
 if %errorlevel% neq 0 (
     echo.

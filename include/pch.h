@@ -1,13 +1,27 @@
 #pragma once
+#if defined(_WIN32) || defined(CYGWIN)
+#define NOMINMAX
+#include <Windows.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#endif
+#include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <chrono>
+#include <expected>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <map>
+#include <memory>
 #include <optional>
+#include <queue>
 #include <regex>
 #include <set>
 #include <sstream>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -18,39 +32,23 @@
 #include <variant>
 #include <vector>
 
-#if defined(_WIN32) || defined(CYGWIN)
-#define NOMINMAX
-#include <Windows.h>
-#elif defined(__linux__)
-#include <unistd.h>
-#endif
-#include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <map>
-#include <memory>
-#include <queue>
-#include <stack>
-#include <expected>
-
-#include <fmt/format.h>
+#include <fmt/core.h>
+#define GLFW_INCLUDE_VULKAN
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include "vulkan/vulkan.h"
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <stb_image.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include <imgui_impl_vulkan.h>
 #include <spdlog/common.h>
-#ifdef WIN32
-#include "Windows.h"
-#elif (UNIX)
-#include "unistd.h"
-#endif
+#include <stb_image.h>
 
 #include "color.h"
+#include "mouse.h"
 
 using Entity = std::uint32_t;

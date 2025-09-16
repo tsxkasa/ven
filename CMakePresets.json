@@ -12,7 +12,8 @@
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build/x64-Debug",
       "cacheVariables": {
-        "CUSTOM_COMPILE_FLAGS": "-Zi;-Od;-DDEBUG;-RTC1;-MDd;-W4"
+        "CUSTOM_COMPILE_FLAGS": "-Zi;-Od;-DDEBUG;-RTC1;-MDd;-W4",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {}
     },
@@ -22,7 +23,8 @@
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build/x64-Release",
       "cacheVariables": {
-        "CUSTOM_COMPILE_FLAGS": "-O2;-DNDEBUG;-GL;-MD;-W4"
+        "CUSTOM_COMPILE_FLAGS": "-O2;-DNDEBUG;-GL;-MD;-W4",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {}
     },
@@ -35,7 +37,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer"
+        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {
         "CC": "clang",
@@ -51,7 +54,8 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra"
+        "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {
         "CC": "clang",
@@ -59,26 +63,28 @@
       }
     },
     {
-        "name": "Linux-GCC-Release",
-        "displayName": "Linux-GCC-Release",
-        "generator": "Ninja",
-        "binaryDir": "${sourceDir}/build/Linux-GCC-Release",
-        "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Release",
-            "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra"
-        },
-        "environment": {}
+      "name": "Linux-GCC-Release",
+      "displayName": "Linux-GCC-Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/Linux-GCC-Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CUSTOM_COMPILE_FLAGS": "-O3;-DNDEBUG;-Wall;-Wextra",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      },
+      "environment": {}
     },
     {
-        "name": "Linux-GCC-Debug",
-        "displayName": "Linux-GCC-Debug",
-        "generator": "Ninja",
-        "binaryDir": "${sourceDir}/build/Linux-GCC-Debug",
-        "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Debug",
-            "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer"
-        },
-        "environment": {}
+      "name": "Linux-GCC-Debug",
+      "displayName": "Linux-GCC-Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/Linux-GCC-Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      },
+      "environment": {}
     }
   ],
   "buildPresets": [

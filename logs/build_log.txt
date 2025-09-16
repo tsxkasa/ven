@@ -1,0 +1,163 @@
+--- CMake Build Log - 15-Sep-25 22:20:42.67 ---
+--- Configuring CMake --- 
+-- Running vcpkg install
+Detecting compiler hash for triplet x64-windows...
+Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe
+The following packages will be built and installed:
+    fmt:x64-windows@11.2.0
+    glfw3:x64-windows@3.4#1
+    glm:x64-windows@1.0.1#3
+    imgui[core,glfw-binding,vulkan-binding]:x64-windows@1.91.9
+    spdlog:x64-windows@1.15.3
+    stb:x64-windows@2024-07-29#1
+  * vcpkg-cmake:x64-windows@2024-04-23
+  * vcpkg-cmake-config:x64-windows@2024-05-23
+    vulkan:x64-windows@2023-12-17
+  * vulkan-headers:x64-windows@1.4.309.0
+  * vulkan-loader:x64-windows@1.4.309.0#2
+Additional packages (*) will be modified to complete this operation.
+Restored 11 package(s) from C:\Users\Shan\AppData\Local\vcpkg\archives in 691 ms. Use --debug to see more details.
+Installing 1/11 vcpkg-cmake-config:x64-windows@2024-05-23...
+Elapsed time to handle vcpkg-cmake-config:x64-windows: 4.97 ms
+vcpkg-cmake-config:x64-windows package ABI: 0bc98ecd0e860be8ed471ed5064006b1c02bd110db9ffe289304f5ba0c335ec6
+Installing 2/11 vcpkg-cmake:x64-windows@2024-04-23...
+Elapsed time to handle vcpkg-cmake:x64-windows: 6.17 ms
+vcpkg-cmake:x64-windows package ABI: e236afe3a35cfb336b80af8c7c391d93847da346402359e581d5ab776dbf4697
+Installing 3/11 fmt:x64-windows@11.2.0...
+Elapsed time to handle fmt:x64-windows: 21.6 ms
+fmt:x64-windows package ABI: d579b5e4a13bf9fa77803bf1fbddfabe56619fe3ee3ad59fde6db8e6c44fdd55
+Installing 4/11 glfw3:x64-windows@3.4#1...
+Elapsed time to handle glfw3:x64-windows: 11.7 ms
+glfw3:x64-windows package ABI: 3e15244d6a93dcaff3d21a732e0dd29882acd9ecef1eef04a75f738ec716dac4
+Installing 5/11 glm:x64-windows@1.0.1#3...
+Elapsed time to handle glm:x64-windows: 221 ms
+glm:x64-windows package ABI: f3a6dd92bb6c732824019db50e54eec0e1a71e12eec5c38e448465ba7909d4a4
+Installing 6/11 vulkan-headers:x64-windows@1.4.309.0...
+Elapsed time to handle vulkan-headers:x64-windows: 47.6 ms
+vulkan-headers:x64-windows package ABI: 85938c72030fa7f4fc053c9047dc63aacbb8db2d1387823e8154f764bedbad99
+Installing 7/11 vulkan-loader:x64-windows@1.4.309.0#2...
+Elapsed time to handle vulkan-loader:x64-windows: 12.1 ms
+vulkan-loader:x64-windows package ABI: 8d5f24c36fdb9a2c7cb1d6ddd70f0b6ae86373ecc4edc2a3a43d5c26e2d75126
+Installing 8/11 vulkan:x64-windows@2023-12-17...
+Elapsed time to handle vulkan:x64-windows: 5.39 ms
+vulkan:x64-windows package ABI: 473c0970e301a06e8840f526c22054b42b714d4298dac88cbbd65e25de18ffb8
+Installing 9/11 imgui[core,glfw-binding,vulkan-binding]:x64-windows@1.91.9...
+Elapsed time to handle imgui:x64-windows: 18.7 ms
+imgui:x64-windows package ABI: b9d5e1e550622577ee7cc771d4b661cd738f870146ac558f8f11d9a6e03e1ff2
+Installing 10/11 spdlog:x64-windows@1.15.3...
+Elapsed time to handle spdlog:x64-windows: 59.6 ms
+spdlog:x64-windows package ABI: 763c3afacc33de087d18aa72ba60dfd4d349c1687e7fecaff09d48cd8c574438
+Installing 11/11 stb:x64-windows@2024-07-29#1...
+Elapsed time to handle stb:x64-windows: 16.8 ms
+stb:x64-windows package ABI: 1016c44e964c3108587c9a4878ccbaaefae5d33219ed99c08e55e745b6d258bd
+Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
+Packages installed in this vcpkg installation declare the following licenses:
+(Apache-2.0 OR MIT)
+(MIT OR CC-PDDC)
+MIT
+Zlib
+The package fmt provides CMake targets:
+
+    find_package(fmt CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE fmt::fmt)
+
+    # Or use the header-only version
+    find_package(fmt CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE fmt::fmt-header-only)
+
+glfw3 provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(glfw3 CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE glfw)
+
+glfw3 provides pkg-config modules:
+
+  # A multi-platform library for OpenGL, window and input
+  glfw3
+
+The package glm provides CMake targets:
+
+    find_package(glm CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE glm::glm)
+
+    # Or use the header-only version
+    find_package(glm CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE glm::glm-header-only)
+
+vulkan is compatible with built-in CMake targets:
+
+    # https://cmake.org/cmake/help/latest/module/FindVulkan.html
+    find_package(Vulkan REQUIRED)
+    target_link_libraries(main PRIVATE Vulkan::Vulkan)
+
+imgui provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(imgui CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE imgui::imgui)
+
+The package spdlog provides CMake targets:
+
+    find_package(spdlog CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE spdlog::spdlog)
+
+    # Or use the header-only version
+    find_package(spdlog CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE spdlog::spdlog_header_only)
+
+The package stb provides CMake targets:
+
+    find_package(Stb REQUIRED)
+    target_include_directories(main PRIVATE ${Stb_INCLUDE_DIR})
+All requested installations completed successfully in: 433 ms
+-- Running vcpkg install - done
+-- The CXX compiler identification is Clang 20.1.7 with GNU-like command-line
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/LLVM/bin/clang++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Check if compiler accepts -pthread
+-- Check if compiler accepts -pthread - no
+-- Found Threads: TRUE
+-- Found Vulkan: D:/Downloads/repos/ven/build/x64-Clang-Release/vcpkg_installed/x64-windows/lib/vulkan-1.lib (found version "1.4.309") found components: glslc glslangValidator
+-- Found Stb: D:/Downloads/repos/ven/build/x64-Clang-Release/vcpkg_installed/x64-windows/include
+--     To build: Ensure a C/C++ compiler is installed.
+--     Ensure VCPKG_ROOT is set in environment path.
+--     IMPORTANT: If build fails, check log files in: 
+--     Final executable expected at: 
+-- Project: ven
+--   Build Directory: D:/Downloads/repos/ven/build/x64-Clang-Release
+-- Configuring done (7.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: D:/Downloads/repos/ven/build/x64-Clang-Release
+--- Building Project --- 
+[1/11] Compiling shader shader.vert
+[2/11] Compiling shader shader.frag
+[3/11] Building CXX object CMakeFiles/ven.dir/cmake_pch.hxx.pch
+[4/11] Building CXX object CMakeFiles/ven.dir/src/ven/app/ven_app.cpp.obj
+[5/11] Building CXX object CMakeFiles/ven.dir/src/pch.cpp.obj
+[6/11] Building CXX object CMakeFiles/ven.dir/src/ven/ui/ven_ui.cpp.obj
+[7/11] Building CXX object CMakeFiles/ven.dir/src/main.cpp.obj
+[8/11] Building CXX object CMakeFiles/ven.dir/src/ven/window/ven_window.cpp.obj
+[9/11] Building CXX object CMakeFiles/ven.dir/src/ven/render/ven_pipeline.cpp.obj
+[10/11] Building CXX object CMakeFiles/ven.dir/src/ven/render/ven_device.cpp.obj
+D:/Downloads/repos/ven/src/ven/render/ven_device.cpp:9:54: warning: unused parameter 'messageSeverity' [-Wunused-parameter]
+    9 | debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+      |                                                      ^
+D:/Downloads/repos/ven/src/ven/render/ven_device.cpp:10:47: warning: unused parameter 'messageType' [-Wunused-parameter]
+   10 |               VkDebugUtilsMessageTypeFlagsEXT messageType,
+      |                                               ^
+D:/Downloads/repos/ven/src/ven/render/ven_device.cpp:12:21: warning: unused parameter 'pUserData' [-Wunused-parameter]
+   12 |               void *pUserData) {
+      |                     ^
+3 warnings generated.
+[11/11] Linking CXX executable D:\Downloads\repos\ven\out\ven.exe
