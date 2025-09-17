@@ -7,7 +7,20 @@
 
 namespace ven {
 
-struct PipelineConfigInfo {};
+struct PipelineConfigInfo {
+  VkViewport viewport;
+  VkRect2D scissor;
+  VkPipelineViewportStateCreateInfo viewport_info;
+  VkPipelineInputAssemblyStateCreateInfo input_asm_info;
+  VkPipelineRasterizationStateCreateInfo rasterization_info;
+  VkPipelineMultisampleStateCreateInfo multisample_info;
+  VkPipelineColorBlendAttachmentState colorblend_attachment;
+  VkPipelineColorBlendStateCreateInfo colorblend_info;
+  VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
+  VkPipelineLayout pipeline_layout = nullptr;
+  VkRenderPass render_pass = nullptr;
+  uint32_t subpass = 0;
+};
 
 class Pipeline {
 public:

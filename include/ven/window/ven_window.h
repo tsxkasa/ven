@@ -13,17 +13,23 @@ public:
 
   int shouldClose() const;
 
-  void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
+  void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
-  inline const GLFWwindow *getWindow() const { return window; }
-  inline const GLFWmonitor *getMonitor() const { return monitor; }
-  inline const GLFWvidmode *getVidMode() const { return vmode; }
+  inline const GLFWwindow* getWindow() const {
+    return window;
+  }
+  inline const GLFWmonitor* getMonitor() const {
+    return monitor;
+  }
+  inline const GLFWvidmode* getVidMode() const {
+    return vmode;
+  }
 
 private:
   std::string window_title;
-  GLFWwindow *window;
-  GLFWmonitor *monitor;
-  const GLFWvidmode *vmode;
+  GLFWwindow* window;
+  GLFWmonitor* monitor;
+  const GLFWvidmode* vmode;
 
   /**
    * @brief Initializes the borderless window.
