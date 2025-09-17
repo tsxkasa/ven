@@ -29,6 +29,5 @@ private:
    * @brief Initializes the borderless window.
    */
   void initWindow();
-  void initImGui();
 };
 } // namespace ven

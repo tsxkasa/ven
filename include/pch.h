@@ -1,9 +1,9 @@
 #pragma once
 #if defined(_WIN32) || defined(CYGWIN)
-#define NOMINMAX
-#include <Windows.h>
+#  define NOMINMAX
+#  include <Windows.h>
 #elif defined(__linux__)
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 #include <algorithm>
 #include <cassert>
@@ -36,7 +36,6 @@
 #define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "vulkan/vulkan.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -47,6 +46,8 @@
 #include <imgui_impl_vulkan.h>
 #include <spdlog/common.h>
 #include <stb_image.h>
+#include <vulkan/vulkan.h>
+
 
 #include "color.h"
 #include "mouse.h"

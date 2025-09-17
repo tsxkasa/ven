@@ -1,6 +1,7 @@
 #include "ven_window.h"
 
-ven::Window::Window(std::string name) : window_title(name) {
+ven::Window::Window(std::string name)
+    : window_title(name) {
   glfwInit();
   monitor = glfwGetPrimaryMonitor();
   vmode = glfwGetVideoMode(monitor);
@@ -27,10 +28,12 @@ void ven::Window::initWindow() {
   glfwSetWindowPos(window, 0, 0);
 }
 
-int ven::Window::shouldClose() const { return glfwWindowShouldClose(window); }
+int ven::Window::shouldClose() const {
+  return glfwWindowShouldClose(window);
+}
 
 void ven::Window::createWindowSurface(VkInstance instance,
-                                      VkSurfaceKHR *surface) {
+                                      VkSurfaceKHR* surface) {
   if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS)
     throw std::runtime_error("Failed to create window surface.");
 }
