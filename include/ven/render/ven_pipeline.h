@@ -10,22 +10,22 @@ namespace ven {
 struct PipelineConfigInfo {
   VkViewport viewport;
   VkRect2D scissor;
-  VkPipelineViewportStateCreateInfo viewport_info;
-  VkPipelineInputAssemblyStateCreateInfo input_asm_info;
-  VkPipelineRasterizationStateCreateInfo rasterization_info;
-  VkPipelineMultisampleStateCreateInfo multisample_info;
-  VkPipelineColorBlendAttachmentState colorblend_attachment;
-  VkPipelineColorBlendStateCreateInfo colorblend_info;
-  VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
-  VkPipelineLayout pipeline_layout = nullptr;
-  VkRenderPass render_pass = nullptr;
+  VkPipelineViewportStateCreateInfo viewportInfo;
+  VkPipelineInputAssemblyStateCreateInfo inputAsmInfo;
+  VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+  VkPipelineMultisampleStateCreateInfo multisampleInfo;
+  VkPipelineColorBlendAttachmentState colorBlendAttachment;
+  VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+  VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+  VkPipelineLayout pipelineLayout = nullptr;
+  VkRenderPass renderPass = nullptr;
   uint32_t subpass = 0;
 };
 
 class Pipeline {
 public:
-  Pipeline(ven::Device& device, const std::string& vert_path,
-           const std::string& frag_path, const ven::PipelineConfigInfo& config);
+  Pipeline(ven::Device& device, const std::string& vertPath,
+           const std::string& fragPath, const ven::PipelineConfigInfo& config);
 
   ~Pipeline() {};
 
@@ -36,15 +36,14 @@ public:
                                                    uint32_t height);
 
 private:
-  ven::Device& ven_device;
-  VkPipeline graphics_pipeline;
-  VkShaderModule vert_module;
-  VkShaderModule frag_module;
+  ven::Device& venDevice;
+  VkPipeline graphicsPipeline;
+  VkShaderModule vertModule;
+  VkShaderModule fragModule;
 
   static std::vector<char> readShaders(const std::string& path);
 
-  void createPipeline(const std::string& vert_path,
-                      const std::string& frag_path,
+  void createPipeline(const std::string& vertPath, const std::string& fragPath,
                       const PipelineConfigInfo& config);
 
   void createShaderModule(const std::vector<char>& code, VkShaderModule* mod);

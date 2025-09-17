@@ -1,10 +1,10 @@
 #include "ven_window.h"
 
 ven::Window::Window(std::string name)
-    : window_title(name) {
+    : windowTitle(name) {
   glfwInit();
   monitor = glfwGetPrimaryMonitor();
-  vmode = glfwGetVideoMode(monitor);
+  vidMode = glfwGetVideoMode(monitor);
   initWindow();
 }
 
@@ -17,13 +17,13 @@ void ven::Window::initWindow() {
   // Set window hints to create a borderless window
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-  glfwWindowHint(GLFW_RED_BITS, vmode->redBits);
-  glfwWindowHint(GLFW_GREEN_BITS, vmode->greenBits);
-  glfwWindowHint(GLFW_BLUE_BITS, vmode->blueBits);
-  glfwWindowHint(GLFW_REFRESH_RATE, vmode->refreshRate);
+  glfwWindowHint(GLFW_RED_BITS, vidMode->redBits);
+  glfwWindowHint(GLFW_GREEN_BITS, vidMode->greenBits);
+  glfwWindowHint(GLFW_BLUE_BITS, vidMode->blueBits);
+  glfwWindowHint(GLFW_REFRESH_RATE, vidMode->refreshRate);
 
-  window =
-      glfwCreateWindow(vmode->width, vmode->height, "Hello World", NULL, NULL);
+  window = glfwCreateWindow(vidMode->width, vidMode->height, "Hello World",
+                            NULL, NULL);
 
   glfwSetWindowPos(window, 0, 0);
 }

@@ -22,14 +22,14 @@ public:
     return monitor;
   }
   inline const GLFWvidmode* getVidMode() const {
-    return vmode;
+    return vidMode;
   }
 
 private:
-  std::string window_title;
+  std::string windowTitle;
   GLFWwindow* window;
   GLFWmonitor* monitor;
-  const GLFWvidmode* vmode;
+  const GLFWvidmode* vidMode;
 
   /**
    * @brief Initializes the borderless window.

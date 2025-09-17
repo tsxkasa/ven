@@ -9,7 +9,7 @@ void ven::App::run() {
 void ven::App::init() {}
 
 void ven::App::loop() {
-  while (!ven_window.shouldClose()) {
+  while (!venWindow.shouldClose()) {
     glfwPollEvents();
   }
 }

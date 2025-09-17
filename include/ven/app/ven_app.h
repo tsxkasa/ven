@@ -12,16 +12,16 @@ public:
   void run();
 
   inline const ven::Window& getAppWindow() const {
-    return ven_window;
+    return venWindow;
   }
 
 private:
-  ven::Window ven_window{"App"};
-  ven::Device ven_device{ven_window};
+  ven::Window venWindow{"App"};
+  ven::Device venDevice{venWindow};
   ven::Pipeline pipeline{
-      ven_device, "shaders/shader.vert.spv", "shaders/shader.frag.spv",
-      Pipeline::defaultConfigInfo(ven_window.getVidMode()->width,
-                                  ven_window.getVidMode()->height)};
+      venDevice, "shaders/shader.vert.spv", "shaders/shader.frag.spv",
+      Pipeline::defaultConfigInfo(venWindow.getVidMode()->width,
+                                  venWindow.getVidMode()->height)};
 
   void init();
   void loop();
