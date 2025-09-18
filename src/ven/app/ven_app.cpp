@@ -1,6 +1,8 @@
 #include "ven_app.h"
 #include "ven_pipeline.h"
 #include "ven_swap_chain.h"
+#include <cstdint>
+#include <stdexcept>
 #include <vulkan/vulkan_core.h>
 
 ven::App::App() {
@@ -16,7 +18,10 @@ ven::App::~App() {
 void ven::App::run() {
   while (!venWindow.shouldClose()) {
     glfwPollEvents();
+    draw();
   }
+
+  vkDeviceWaitIdle(venDevice.device());
 }
 
 void ven::App::createPipelineLayout() {
@@ -43,6 +48,63 @@ void ven::App::createPipeline() {
       pipelineConfig);
 }
 
-void ven::App::createCmdBuffers() {}
+void ven::App::createCmdBuffers() {
+  cmdBuffers.resize(venSwapChain.imageCount());
 
-void ven::App::draw() {}
+  VkCommandBufferAllocateInfo allocInfo{};
+  allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandPool = venDevice.getCommandPool();
+  allocInfo.commandBufferCount = static_cast<uint32_t>(cmdBuffers.size());
+
+  if (vkAllocateCommandBuffers(venDevice.device(), &allocInfo,
+                               cmdBuffers.data()) != VK_SUCCESS)
+    throw std::runtime_error("Failed to create command buffers");
+
+  for (uint32_t i = 0; i < cmdBuffers.size(); i++) {
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(cmdBuffers[i], &beginInfo) != VK_SUCCESS)
+      throw std::runtime_error("Failed to begin recording command buffer");
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = venSwapChain.getRenderPass();
+    renderPassInfo.framebuffer = venSwapChain.getFrameBuffer(i);
+
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = venSwapChain.getSwapChainExtent();
+
+    std::array<VkClearValue, 2> clearValues{};
+    // BACKGROUND: #D7E6BC
+    clearValues[0].color = {{0.843f, 0.901f, 0.737f, 1.0f}};
+    clearValues[1].depthStencil = {1.0f, 0};
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(cmdBuffers[i], &renderPassInfo,
+                         VK_SUBPASS_CONTENTS_INLINE);
+
+    venPipeline->bind(cmdBuffers[i]);
+    vkCmdDraw(cmdBuffers[i], 3, 1, 0, 0);
+
+    vkCmdEndRenderPass(cmdBuffers[i]);
+    if (vkEndCommandBuffer(cmdBuffers[i]) != VK_SUCCESS)
+      throw std::runtime_error("Failed to record command buffer");
+  }
+}
+
+void ven::App::draw() {
+  uint32_t imageIndex = 0;
+  VkResult result = venSwapChain.acquireNextImage(&imageIndex);
+
+  if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    throw std::runtime_error("Failed to acquire swap chain image");
+
+  result =
+      venSwapChain.submitCommandBuffers(&cmdBuffers[imageIndex], &imageIndex);
+
+  if (result != VK_SUCCESS)
+    throw std::runtime_error("Failed to present swap chain image");
+}

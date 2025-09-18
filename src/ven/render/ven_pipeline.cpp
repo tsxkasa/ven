@@ -117,6 +117,11 @@ void ven::Pipeline::createShaderModule(const std::vector<char>& code,
     throw std::runtime_error("Failed to create shader module.");
 }
 
+void ven::Pipeline::bind(VkCommandBuffer cmdBuffer) {
+  vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    graphicsPipeline);
+}
+
 void ven::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,
                                               uint32_t width, uint32_t height) {
 
