@@ -4,11 +4,14 @@
 #include "ven_ui.h"
 
 int main() {
-  ven::App venApp;
-  uint32_t extensionCount = 0;
-  vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+  ven::App app{};
 
-  fmt::println("{:d} extensions supported.", extensionCount);
-  venApp.run();
-  return 0;
+  try {
+    app.run();
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }

@@ -27,13 +27,13 @@ public:
   Pipeline(ven::Device& device, const std::string& vertPath,
            const std::string& fragPath, const ven::PipelineConfigInfo& config);
 
-  ~Pipeline() {};
+  ~Pipeline();
 
   Pipeline(const Pipeline&) = delete;
   void operator=(const Pipeline&) = delete;
 
-  static ven::PipelineConfigInfo defaultConfigInfo(uint32_t width,
-                                                   uint32_t height);
+  static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,
+                                        uint32_t width, uint32_t height);
 
 private:
   ven::Device& venDevice;

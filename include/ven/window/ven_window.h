@@ -1,6 +1,9 @@
 #pragma once
 
 #include "pch.h"
+#include <GLFW/glfw3.h>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace ven {
 class Window {
@@ -8,10 +11,16 @@ public:
   /**
    * @param {name} window title
    */
-  Window(std::string name);
+  Window(std::string name, int w, int h);
   ~Window();
 
-  int shouldClose() const;
+  inline int shouldClose() const {
+    return glfwWindowShouldClose(window);
+  }
+
+  inline VkExtent2D getExtent() const {
+    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+  }
 
   void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
@@ -26,6 +35,8 @@ public:
   }
 
 private:
+  int width;
+  int height;
   std::string windowTitle;
   GLFWwindow* window;
   GLFWmonitor* monitor;

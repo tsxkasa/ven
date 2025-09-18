@@ -1,7 +1,9 @@
 #include "ven_window.h"
 
-ven::Window::Window(std::string name)
-    : windowTitle(name) {
+ven::Window::Window(std::string name, int w, int h)
+    : width(w)
+    , height(h)
+    , windowTitle(name) {
   glfwInit();
   monitor = glfwGetPrimaryMonitor();
   vidMode = glfwGetVideoMode(monitor);
@@ -14,22 +16,24 @@ ven::Window::~Window() {
 }
 
 void ven::Window::initWindow() {
-  // Set window hints to create a borderless window
+  /*
+     // Set window hints to create a borderless window
+     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+     glfwWindowHint(GLFW_RED_BITS, vidMode->redBits);
+     glfwWindowHint(GLFW_GREEN_BITS, vidMode->greenBits);
+     glfwWindowHint(GLFW_BLUE_BITS, vidMode->blueBits);
+     glfwWindowHint(GLFW_REFRESH_RATE, vidMode->refreshRate);
+
+     window = glfwCreateWindow(vidMode->width, vidMode->height, "Hello World",
+                               NULL, NULL);
+
+     glfwSetWindowPos(window, 0, 0);
+   */
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-  glfwWindowHint(GLFW_RED_BITS, vidMode->redBits);
-  glfwWindowHint(GLFW_GREEN_BITS, vidMode->greenBits);
-  glfwWindowHint(GLFW_BLUE_BITS, vidMode->blueBits);
-  glfwWindowHint(GLFW_REFRESH_RATE, vidMode->refreshRate);
-
-  window = glfwCreateWindow(vidMode->width, vidMode->height, "Hello World",
-                            NULL, NULL);
-
-  glfwSetWindowPos(window, 0, 0);
-}
-
-int ven::Window::shouldClose() const {
-  return glfwWindowShouldClose(window);
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+  window =
+      glfwCreateWindow(width, height, windowTitle.c_str(), nullptr, nullptr);
 }
 
 void ven::Window::createWindowSurface(VkInstance instance,

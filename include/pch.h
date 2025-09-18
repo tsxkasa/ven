@@ -6,6 +6,7 @@
 #  include <unistd.h>
 #endif
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <chrono>
@@ -32,6 +33,7 @@
 #include <variant>
 #include <vector>
 
+
 #include <fmt/core.h>
 #define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS
@@ -47,7 +49,6 @@
 #include <spdlog/common.h>
 #include <stb_image.h>
 #include <vulkan/vulkan.h>
-
 
 #include "color.h"
 #include "mouse.h"

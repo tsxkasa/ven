@@ -39,6 +39,7 @@ set(VEN_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ven/ui/ven_ui.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_pipeline.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_device.cpp"
+    "${PROJECT_ROOT_DIR}/src/ven/render/ven_swap_chain.cpp"
 )
 
 set(COMMON_SOURCE_FILES

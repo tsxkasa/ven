@@ -1,4 +1,6 @@
 #include "ven_pipeline.h"
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vulkan/vulkan_core.h>
@@ -9,6 +11,12 @@ ven::Pipeline::Pipeline(ven::Device& device, const std::string& vertPath,
                         const ven::PipelineConfigInfo& config)
     : venDevice{device} {
   createPipeline(vertPath, fragPath, config);
+}
+
+ven::Pipeline::~Pipeline() {
+  vkDestroyShaderModule(venDevice.device(), vertModule, nullptr);
+  vkDestroyShaderModule(venDevice.device(), fragModule, nullptr);
+  vkDestroyPipeline(venDevice.device(), graphicsPipeline, nullptr);
 }
 
 std::vector<char> ven::Pipeline::readShaders(const std::string& path) {
@@ -32,11 +40,67 @@ std::vector<char> ven::Pipeline::readShaders(const std::string& path) {
 void ven::Pipeline::createPipeline(const std::string& vertPath,
                                    const std::string& fragPath,
                                    const ven::PipelineConfigInfo& config) {
+  assert(config.pipelineLayout != VK_NULL_HANDLE &&
+         "Cannot create graphics pipeline: no pipeline layout provided in "
+         "config.");
+  assert(config.renderPass != VK_NULL_HANDLE &&
+         "Cannot create graphics pipeline: no render pass provided in config.");
   auto vertbin = readShaders(vertPath);
   auto fragbin = readShaders(fragPath);
 
-  fmt::println("Vertex Shader Code Size: {:d}", vertbin.size());
-  fmt::println("Fragment Shader Code Size: {:d}", fragbin.size());
+  createShaderModule(vertbin, &vertModule);
+  createShaderModule(fragbin, &fragModule);
+
+  VkPipelineShaderStageCreateInfo shaderStages[2];
+  shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+  shaderStages[0].module = vertModule;
+  shaderStages[0].pName = "main";
+  shaderStages[0].flags = 0;
+  shaderStages[0].pNext = nullptr;
+  shaderStages[0].pSpecializationInfo = nullptr;
+
+  shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+  shaderStages[1].module = fragModule;
+  shaderStages[1].pName = "main";
+  shaderStages[1].flags = 0;
+  shaderStages[1].pNext = nullptr;
+  shaderStages[1].pSpecializationInfo = nullptr;
+
+  VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+
+  vertexInputInfo.sType =
+      VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+  vertexInputInfo.vertexAttributeDescriptionCount = 0;
+  vertexInputInfo.vertexBindingDescriptionCount = 0;
+  vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+  vertexInputInfo.pVertexBindingDescriptions = nullptr;
+
+  VkGraphicsPipelineCreateInfo pipelineInfo{};
+  pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+  pipelineInfo.stageCount = 2;
+  pipelineInfo.pStages = shaderStages;
+  pipelineInfo.pVertexInputState = &vertexInputInfo;
+  pipelineInfo.pInputAssemblyState = &config.inputAsmInfo;
+  pipelineInfo.pColorBlendState = &config.colorBlendInfo;
+  pipelineInfo.pDepthStencilState = &config.depthStencilInfo;
+  pipelineInfo.pViewportState = &config.viewportInfo;
+  pipelineInfo.pRasterizationState = &config.rasterizationInfo;
+  pipelineInfo.pMultisampleState = &config.multisampleInfo;
+  pipelineInfo.pDynamicState = nullptr;
+
+  pipelineInfo.layout = config.pipelineLayout;
+  pipelineInfo.renderPass = config.renderPass;
+  pipelineInfo.subpass = config.subpass;
+
+  pipelineInfo.basePipelineIndex = -1;
+  pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+  if (vkCreateGraphicsPipelines(venDevice.device(), VK_NULL_HANDLE, 1,
+                                &pipelineInfo, nullptr,
+                                &graphicsPipeline) != VK_SUCCESS)
+    throw std::runtime_error("Failed to create graphics pipeline.");
 }
 
 void ven::Pipeline::createShaderModule(const std::vector<char>& code,
@@ -53,9 +117,8 @@ void ven::Pipeline::createShaderModule(const std::vector<char>& code,
     throw std::runtime_error("Failed to create shader module.");
 }
 
-ven::PipelineConfigInfo ven::Pipeline::defaultConfigInfo(uint32_t width,
-                                                         uint32_t height) {
-  PipelineConfigInfo configInfo{};
+void ven::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,
+                                              uint32_t width, uint32_t height) {
 
   configInfo.inputAsmInfo.sType =
       VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -134,5 +197,4 @@ ven::PipelineConfigInfo ven::Pipeline::defaultConfigInfo(uint32_t width,
   configInfo.depthStencilInfo.stencilTestEnable = VK_FALSE;
   configInfo.depthStencilInfo.front = {};
   configInfo.depthStencilInfo.back = {};
-  return configInfo;
 }

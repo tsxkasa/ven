@@ -3,12 +3,22 @@
 #include "pch.h"
 #include "ven_device.h"
 #include "ven_pipeline.h"
+#include "ven_swap_chain.h"
 #include "ven_ui.h"
 #include "ven_window.h"
+#include <memory>
+#include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace ven {
 class App {
 public:
+  App();
+  ~App();
+
+  App(const App&) = delete;
+  App& operator=(const App&) = delete;
+
   void run();
 
   inline const ven::Window& getAppWindow() const {
@@ -16,15 +26,17 @@ public:
   }
 
 private:
-  ven::Window venWindow{"App"};
+  void createPipelineLayout();
+  void createPipeline();
+  void createCmdBuffers();
+  void draw();
+  int constexpr static WIDTH = 800;
+  int constexpr static HEIGHT = 600;
+  ven::Window venWindow{"App", WIDTH, HEIGHT};
   ven::Device venDevice{venWindow};
-  ven::Pipeline pipeline{
-      venDevice, "shaders/shader.vert.spv", "shaders/shader.frag.spv",
-      Pipeline::defaultConfigInfo(venWindow.getVidMode()->width,
-                                  venWindow.getVidMode()->height)};
-
-  void init();
-  void loop();
-  void cleanup();
+  ven::SwapChain venSwapChain{venDevice, venWindow.getExtent()};
+  std::unique_ptr<ven::Pipeline> venPipeline;
+  VkPipelineLayout pipelineLayout;
+  std::vector<VkCommandBuffer> cmdBuffers;
 };
 } // namespace ven
