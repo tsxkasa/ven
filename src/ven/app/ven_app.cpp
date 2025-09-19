@@ -1,11 +1,15 @@
 #include "ven_app.h"
+#include "ven_model.h"
 #include "ven_pipeline.h"
 #include "ven_swap_chain.h"
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 ven::App::App() {
+  loadModels();
   createPipelineLayout();
   createPipeline();
   createCmdBuffers();
@@ -87,7 +91,8 @@ void ven::App::createCmdBuffers() {
                          VK_SUBPASS_CONTENTS_INLINE);
 
     venPipeline->bind(cmdBuffers[i]);
-    vkCmdDraw(cmdBuffers[i], 3, 1, 0, 0);
+    venModel->bind(cmdBuffers[i]);
+    venModel->draw(cmdBuffers[i]);
 
     vkCmdEndRenderPass(cmdBuffers[i]);
     if (vkEndCommandBuffer(cmdBuffers[i]) != VK_SUCCESS)
@@ -107,4 +112,10 @@ void ven::App::draw() {
 
   if (result != VK_SUCCESS)
     throw std::runtime_error("Failed to present swap chain image");
+}
+
+void ven::App::loadModels() {
+  std::vector<ven::Model::Vertex> vertices{
+      {{0.0f, -0.5f}}, {{0.5f, 0.5f}}, {{-0.5f, 0.5f}}};
+  venModel = std::make_unique<ven::Model>(venDevice, vertices);
 }

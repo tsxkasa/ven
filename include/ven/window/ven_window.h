@@ -1,9 +1,6 @@
 #pragma once
 
 #include "pch.h"
-#include <GLFW/glfw3.h>
-#include <cstdint>
-#include <vulkan/vulkan_core.h>
 
 namespace ven {
 class Window {

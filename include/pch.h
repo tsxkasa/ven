@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cctype>
 #include <chrono>
+#include <cstdint>
+#include <cstring>
 #include <expected>
 #include <filesystem>
 #include <fstream>
@@ -33,8 +35,8 @@
 #include <variant>
 #include <vector>
 
-
 #include <fmt/core.h>
+#include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

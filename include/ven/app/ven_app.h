@@ -2,13 +2,12 @@
 
 #include "pch.h"
 #include "ven_device.h"
+#include "ven_model.h"
 #include "ven_pipeline.h"
 #include "ven_swap_chain.h"
 #include "ven_ui.h"
 #include "ven_window.h"
 #include <memory>
-#include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace ven {
 class App {
@@ -26,6 +25,7 @@ public:
   }
 
 private:
+  void loadModels();
   void createPipelineLayout();
   void createPipeline();
   void createCmdBuffers();
@@ -38,5 +38,6 @@ private:
   std::unique_ptr<ven::Pipeline> venPipeline;
   VkPipelineLayout pipelineLayout;
   std::vector<VkCommandBuffer> cmdBuffers;
+  std::unique_ptr<ven::Model> venModel;
 };
 } // namespace ven
