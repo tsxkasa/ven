@@ -30,11 +30,13 @@ private:
   void createPipeline();
   void createCmdBuffers();
   void draw();
+  void recreateSwapChain();
+  void recordCmdBuffer(int imageIndex);
   int constexpr static WIDTH = 800;
   int constexpr static HEIGHT = 600;
   ven::Window venWindow{"App", WIDTH, HEIGHT};
   ven::Device venDevice{venWindow};
-  ven::SwapChain venSwapChain{venDevice, venWindow.getExtent()};
+  std::unique_ptr<ven::SwapChain> venSwapChain;
   std::unique_ptr<ven::Pipeline> venPipeline;
   VkPipelineLayout pipelineLayout;
   std::vector<VkCommandBuffer> cmdBuffers;

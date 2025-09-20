@@ -1,4 +1,5 @@
 #include "ven_window.h"
+#include <GLFW/glfw3.h>
 
 ven::Window::Window(std::string name, int w, int h)
     : width(w)
@@ -34,10 +35,22 @@ void ven::Window::initWindow() {
   glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
   window =
       glfwCreateWindow(width, height, windowTitle.c_str(), nullptr, nullptr);
+  glfwSetWindowUserPointer(window, this);
+  glfwSetFramebufferSizeCallback(window, framebufferResizedCallback);
 }
 
 void ven::Window::createWindowSurface(VkInstance instance,
                                       VkSurfaceKHR* surface) {
   if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS)
     throw std::runtime_error("Failed to create window surface.");
+}
+
+void ven::Window::framebufferResizedCallback(GLFWwindow* window, int width,
+                                             int height) {
+  auto venWindow =
+      reinterpret_cast<ven::Window*>(glfwGetWindowUserPointer(window));
+
+  venWindow->framebufferResized = true;
+  venWindow->width = width;
+  venWindow->height = height;
 }

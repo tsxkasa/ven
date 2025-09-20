@@ -7,6 +7,7 @@
 namespace ven {
 
 struct PipelineConfigInfo {
+
   VkViewport viewport;
   VkRect2D scissor;
   VkPipelineViewportStateCreateInfo viewportInfo;
@@ -25,11 +26,10 @@ class Pipeline {
 public:
   Pipeline(ven::Device& device, const std::string& vertPath,
            const std::string& fragPath, const ven::PipelineConfigInfo& config);
-
   ~Pipeline();
 
   Pipeline(const Pipeline&) = delete;
-  void operator=(const Pipeline&) = delete;
+  Pipeline operator=(const Pipeline&) = delete;
 
   void bind(VkCommandBuffer cmdBuffer);
   static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,

@@ -21,6 +21,14 @@ public:
 
   void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
+  inline bool wasResized() {
+    return framebufferResized;
+  }
+
+  void resetWindowResizedFlag() {
+    framebufferResized = false;
+  }
+
   inline const GLFWwindow* getWindow() const {
     return window;
   }
@@ -34,6 +42,7 @@ public:
 private:
   int width;
   int height;
+  bool framebufferResized = false;
   std::string windowTitle;
   GLFWwindow* window;
   GLFWmonitor* monitor;
@@ -43,5 +52,8 @@ private:
    * @brief Initializes the borderless window.
    */
   void initWindow();
+
+  static void framebufferResizedCallback(GLFWwindow* window, int width,
+                                         int height);
 };
 } // namespace ven
