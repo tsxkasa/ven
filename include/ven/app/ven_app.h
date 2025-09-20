@@ -29,6 +29,7 @@ private:
   void createPipelineLayout();
   void createPipeline();
   void createCmdBuffers();
+  void freeCmdBuffers();
   void draw();
   void recreateSwapChain();
   void recordCmdBuffer(int imageIndex);

@@ -1,10 +1,24 @@
 #include "ven_swap_chain.h"
-#include <cstdint>
-#include <vulkan/vulkan_core.h>
+#include <memory>
 
 ven::SwapChain::SwapChain(ven::Device& deviceRef, VkExtent2D extent)
     : device{deviceRef}
     , windowExtent{extent} {
+  init();
+}
+
+ven::SwapChain::SwapChain(ven::Device& deviceRef, VkExtent2D extent,
+                          std::shared_ptr<ven::SwapChain> previous)
+    : device{deviceRef}
+    , windowExtent{extent}
+    , oldSwapChain(previous) {
+  init();
+
+  // so it can be released from memory
+  oldSwapChain = nullptr;
+}
+
+void ven::SwapChain::init() {
   createSwapChain();
   createImageViews();
   createRenderPass();
@@ -153,7 +167,8 @@ void ven::SwapChain::createSwapChain() {
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  createInfo.oldSwapchain =
+      !oldSwapChain ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) !=
       VK_SUCCESS) {

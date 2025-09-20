@@ -43,9 +43,11 @@ void ven::App::createPipelineLayout() {
 }
 
 void ven::App::createPipeline() {
-  PipelineConfigInfo pipelineConfig{};
-  ven::Pipeline::defaultPipelineConfigInfo(
-      pipelineConfig, venSwapChain->width(), venSwapChain->height());
+  assert(venSwapChain && "Cannot create pipeline before swap chain");
+  assert(pipelineLayout && "Cannot create pipeline before layout");
+
+  ven::PipelineConfigInfo pipelineConfig{};
+  ven::Pipeline::defaultPipelineConfigInfo(pipelineConfig);
   pipelineConfig.renderPass = venSwapChain->getRenderPass();
   pipelineConfig.pipelineLayout = pipelineLayout;
   venPipeline = std::make_unique<ven::Pipeline>(
@@ -65,6 +67,13 @@ void ven::App::createCmdBuffers() {
   if (vkAllocateCommandBuffers(venDevice.device(), &allocInfo,
                                cmdBuffers.data()) != VK_SUCCESS)
     throw std::runtime_error("Failed to create command buffers");
+}
+
+void ven::App::freeCmdBuffers() {
+  vkFreeCommandBuffers(venDevice.device(), venDevice.getCommandPool(),
+                       static_cast<float>(cmdBuffers.size()),
+                       cmdBuffers.data());
+  cmdBuffers.clear();
 }
 
 void ven::App::recordCmdBuffer(int imageIndex) {
@@ -92,6 +101,18 @@ void ven::App::recordCmdBuffer(int imageIndex) {
   vkCmdBeginRenderPass(cmdBuffers[imageIndex], &renderPassInfo,
                        VK_SUBPASS_CONTENTS_INLINE);
 
+  VkViewport viewport{};
+  viewport.x = 0.0f;
+  viewport.y = 0.0f;
+  viewport.width = static_cast<float>(venSwapChain->getSwapChainExtent().width);
+  viewport.height =
+      static_cast<float>(venSwapChain->getSwapChainExtent().height);
+  viewport.minDepth = 0.0f;
+  viewport.maxDepth = 1.0f;
+  VkRect2D scissor{{0, 0}, venSwapChain->getSwapChainExtent()};
+  vkCmdSetViewport(cmdBuffers[imageIndex], 0, 1, &viewport);
+  vkCmdSetScissor(cmdBuffers[imageIndex], 0, 1, &scissor);
+
   venPipeline->bind(cmdBuffers[imageIndex]);
   venModel->bind(cmdBuffers[imageIndex]);
   venModel->draw(cmdBuffers[imageIndex]);
@@ -109,8 +130,17 @@ void ven::App::recreateSwapChain() {
   }
 
   vkDeviceWaitIdle(venDevice.device());
-  venSwapChain = nullptr;
-  venSwapChain = std::make_unique<ven::SwapChain>(venDevice, extent);
+  if (!venSwapChain)
+    venSwapChain = std::make_unique<ven::SwapChain>(venDevice, extent);
+  else {
+    venSwapChain = std::make_unique<ven::SwapChain>(venDevice, extent,
+                                                    std::move(venSwapChain));
+
+    if (venSwapChain->imageCount() != cmdBuffers.size()) {
+      freeCmdBuffers();
+      createCmdBuffers();
+    }
+  }
   createPipeline();
 }
 
