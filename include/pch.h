@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cctype>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <expected>
@@ -34,6 +35,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
+
 
 #include <fmt/core.h>
 #include <vulkan/vulkan_core.h>
