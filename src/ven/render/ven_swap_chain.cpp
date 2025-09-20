@@ -1,5 +1,6 @@
 #include "ven_swap_chain.h"
 #include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 ven::SwapChain::SwapChain(ven::Device& deviceRef, VkExtent2D extent)
     : device{deviceRef}
@@ -356,7 +357,7 @@ void ven::SwapChain::createSyncObjects() {
 VkSurfaceFormatKHR ven::SwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR>& availableFormats) {
   for (const auto& availableFormat : availableFormats) {
-    if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
         availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
       return availableFormat;
     }
