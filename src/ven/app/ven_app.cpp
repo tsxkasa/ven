@@ -170,9 +170,67 @@ void ven::App::draw() {
     throw std::runtime_error("Failed to present swap chain image");
 }
 
+glm::vec3 rgb(float h, float s, float v) {
+  float c = v * s; // Chroma
+  float x = c * (1.0f - glm::abs(glm::mod(h / 60.0f, 2.0f) - 1.0f));
+  float m = v - c;
+
+  float r, g, b;
+  if (h >= 0.0f && h < 60.0f) {
+    r = c;
+    g = x;
+    b = 0.0f;
+  } else if (h >= 60.0f && h < 120.0f) {
+    r = x;
+    g = c;
+    b = 0.0f;
+  } else if (h >= 120.0f && h < 180.0f) {
+    r = 0.0f;
+    g = c;
+    b = x;
+  } else if (h >= 180.0f && h < 240.0f) {
+    r = 0.0f;
+    g = x;
+    b = c;
+  } else if (h >= 240.0f && h < 300.0f) {
+    r = x;
+    g = 0.0f;
+    b = c;
+  } else {
+    r = c;
+    g = 0.0f;
+    b = x;
+  }
+
+  return glm::vec3(r + m, g + m, b + m);
+}
+
 void ven::App::loadModels() {
-  std::vector<ven::Model::Vertex> vertices{{{-0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
-                                           {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-                                           {{0.0f, -0.5f}, {0.0f, 0.0f, 1.0f}}};
+  int screenWidth = venWindow.getVidMode()->width;
+  int screenHeight = venWindow.getVidMode()->height;
+  float radius = 100.0f;
+  float normalizedX = (2.0f * radius) / screenWidth;
+  float normalizedY = (2.0f * radius) / screenHeight;
+  int vert = 52;
+  float step = (2.0f * glm::pi<float>()) / (vert - 2);
+  std::vector<ven::Model::Vertex> vertices{};
+
+  vertices.push_back(ven::Model::Vertex{{0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
+
+  for (int i = 0; i < vert; i++) {
+    float angle = step * i;
+
+    glm::vec2 position = {normalizedX * cos(angle), normalizedY * sin(angle)};
+
+    float hue = glm::mod((angle / (2.0f * glm::pi<float>())) * 360.0f, 360.0f);
+
+    float saturation = 1.0f;
+    float value = 1.0f;
+
+    glm::vec3 color = rgb(hue, saturation, value);
+
+    vertices.push_back(ven::Model::Vertex{position, color});
+  }
+
   venModel = std::make_unique<ven::Model>(venDevice, vertices);
 }

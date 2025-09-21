@@ -3,8 +3,6 @@
 #include "pch.h"
 #include "ven_device.h"
 #include "ven_model.h"
-#include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace ven {
 

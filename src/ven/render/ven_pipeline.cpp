@@ -131,7 +131,7 @@ void ven::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 
   configInfo.inputAsmInfo.sType =
       VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-  configInfo.inputAsmInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+  configInfo.inputAsmInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
   configInfo.inputAsmInfo.primitiveRestartEnable = VK_FALSE;
 
   configInfo.viewportInfo.sType =
