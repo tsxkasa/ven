@@ -2,12 +2,48 @@
 #include "ven_model.h"
 #include "ven_pipeline.h"
 #include "ven_swap_chain.h"
-#include <GLFW/glfw3.h>
-#include <cstdint>
-#include <memory>
-#include <stdexcept>
-#include <vector>
-#include <vulkan/vulkan_core.h>
+
+namespace ven {
+struct TempPushConstantData {
+  glm::vec2 offset;
+  alignas(16) glm::vec3 color; // vec3 requires 16 bytes alignment
+};
+} // namespace ven
+
+glm::vec3 rgb(float h, float s, float v) {
+  float c = v * s; // Chroma
+  float x = c * (1.0f - glm::abs(glm::mod(h / 60.0f, 2.0f) - 1.0f));
+  float m = v - c;
+
+  float r, g, b;
+  if (h >= 0.0f && h < 60.0f) {
+    r = c;
+    g = x;
+    b = 0.0f;
+  } else if (h >= 60.0f && h < 120.0f) {
+    r = x;
+    g = c;
+    b = 0.0f;
+  } else if (h >= 120.0f && h < 180.0f) {
+    r = 0.0f;
+    g = c;
+    b = x;
+  } else if (h >= 180.0f && h < 240.0f) {
+    r = 0.0f;
+    g = x;
+    b = c;
+  } else if (h >= 240.0f && h < 300.0f) {
+    r = x;
+    g = 0.0f;
+    b = c;
+  } else {
+    r = c;
+    g = 0.0f;
+    b = x;
+  }
+
+  return glm::vec3(r + m, g + m, b + m);
+}
 
 ven::App::App() {
   loadModels();
@@ -30,12 +66,19 @@ void ven::App::run() {
 }
 
 void ven::App::createPipelineLayout() {
+
+  VkPushConstantRange pushConstRange{};
+  pushConstRange.stageFlags =
+      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+  pushConstRange.offset = 0;
+  pushConstRange.size = sizeof(ven::TempPushConstantData);
+
   VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
   pipelineLayoutInfo.setLayoutCount = 0;
   pipelineLayoutInfo.pSetLayouts = nullptr;
-  pipelineLayoutInfo.pushConstantRangeCount = 0;
-  pipelineLayoutInfo.pPushConstantRanges = nullptr;
+  pipelineLayoutInfo.pushConstantRangeCount = 1;
+  pipelineLayoutInfo.pPushConstantRanges = &pushConstRange;
 
   if (vkCreatePipelineLayout(venDevice.device(), &pipelineLayoutInfo, nullptr,
                              &pipelineLayout) != VK_SUCCESS)
@@ -77,6 +120,9 @@ void ven::App::freeCmdBuffers() {
 }
 
 void ven::App::recordCmdBuffer(int imageIndex) {
+  static int frame = 0;
+  frame = (frame + 1) % 100;
+
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -115,7 +161,25 @@ void ven::App::recordCmdBuffer(int imageIndex) {
 
   venPipeline->bind(cmdBuffers[imageIndex]);
   venModel->bind(cmdBuffers[imageIndex]);
-  venModel->draw(cmdBuffers[imageIndex]);
+
+  for (int j = 0; j < 4; j++) {
+    TempPushConstantData push{};
+    push.offset = {-0.5f + frame * 0.02, -0.4f + j * 0.25f};
+    float hue = glm::mod((frame * 5.0f + j * 60.0f), 360.0f);
+    float saturation = 1.0f;
+    float value = 1.0f;
+    glm::vec3 color = rgb(hue, saturation, value);
+    float brightnessMod = 0.6f + 0.4f * sin(frame * 0.2f + j);
+    color *= brightnessMod;
+    push.color = color;
+
+    vkCmdPushConstants(cmdBuffers[imageIndex], pipelineLayout,
+                       VK_SHADER_STAGE_VERTEX_BIT |
+                           VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0, sizeof(TempPushConstantData), &push);
+
+    venModel->draw(cmdBuffers[imageIndex]);
+  }
 
   vkCmdEndRenderPass(cmdBuffers[imageIndex]);
   if (vkEndCommandBuffer(cmdBuffers[imageIndex]) != VK_SUCCESS)
@@ -168,41 +232,6 @@ void ven::App::draw() {
   }
   if (result != VK_SUCCESS)
     throw std::runtime_error("Failed to present swap chain image");
-}
-
-glm::vec3 rgb(float h, float s, float v) {
-  float c = v * s; // Chroma
-  float x = c * (1.0f - glm::abs(glm::mod(h / 60.0f, 2.0f) - 1.0f));
-  float m = v - c;
-
-  float r, g, b;
-  if (h >= 0.0f && h < 60.0f) {
-    r = c;
-    g = x;
-    b = 0.0f;
-  } else if (h >= 60.0f && h < 120.0f) {
-    r = x;
-    g = c;
-    b = 0.0f;
-  } else if (h >= 120.0f && h < 180.0f) {
-    r = 0.0f;
-    g = c;
-    b = x;
-  } else if (h >= 180.0f && h < 240.0f) {
-    r = 0.0f;
-    g = x;
-    b = c;
-  } else if (h >= 240.0f && h < 300.0f) {
-    r = x;
-    g = 0.0f;
-    b = c;
-  } else {
-    r = c;
-    g = 0.0f;
-    b = x;
-  }
-
-  return glm::vec3(r + m, g + m, b + m);
 }
 
 void ven::App::loadModels() {
