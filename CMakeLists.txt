@@ -14,7 +14,6 @@ set(PCH_FILE_H ${PROJECT_ROOT_DIR}/include/pch.h)
 
 set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include"
-    "${PROJECT_ROOT_DIR}/include/utils"
     "${PROJECT_ROOT_DIR}/include/ven/app"
     "${PROJECT_ROOT_DIR}/include/ven/window"
     "${PROJECT_ROOT_DIR}/include/ven/render"
@@ -44,10 +43,10 @@ set(ECS_COMPONENT_SOURCES
 )
 
 set(ECS_SYSTEM_SOURCES
+    "${PROJECT_ROOT_DIR}/src/ecs/system/render_system.cpp"
 )
 
 set(ECS_MANAGER_SOURCES
-    "${PROJECT_ROOT_DIR}/src/ecs/core/entity_manager.cpp"
 )
 
 set(VEN_SYSTEM_SOURCES

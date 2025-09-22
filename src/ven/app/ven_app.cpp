@@ -1,15 +1,7 @@
 #include "ven_app.h"
-#include "ven_model.h"
-#include "ven_pipeline.h"
-#include "ven_swap_chain.h"
-
-namespace ven {
-struct TempPushConstantData {
-  glm::mat2 transform{1.0f};
-  glm::vec2 offset;
-  alignas(16) glm::vec3 color; // vec3 requires 16 bytes alignment
-};
-} // namespace ven
+#include "colors.h"
+#include "model.h"
+#include "transform.h"
 
 glm::vec3 rgb(float h, float s, float v) {
   float c = v * s; // Chroma
@@ -47,10 +39,25 @@ glm::vec3 rgb(float h, float s, float v) {
 }
 
 ven::App::App() {
-  loadModels();
+  init();
+  loadObjects();
   createPipelineLayout();
   recreateSwapChain();
   createCmdBuffers();
+}
+
+void ven::App::init() {
+  coordinator.init();
+
+  coordinator.registerComponent<ecs::comp::Transform2D>();
+  coordinator.registerComponent<ecs::comp::Color>();
+  coordinator.registerComponent<ecs::comp::Model>();
+
+  renderSystem = coordinator.registerSystem<ecs::sys::Render>();
+  Signature renderSig;
+  renderSig.set(coordinator.getComponentType<ecs::comp::Transform2D>());
+  renderSig.set(coordinator.getComponentType<ecs::comp::Model>());
+  coordinator.setSystemSignature<ecs::sys::Render>(renderSig);
 }
 
 ven::App::~App() {
@@ -64,6 +71,43 @@ void ven::App::run() {
   }
 
   vkDeviceWaitIdle(venDevice.device());
+}
+
+void ven::App::loadObjects() {
+  int screenWidth = venWindow.getVidMode()->width;
+  int screenHeight = venWindow.getVidMode()->height;
+  float radius = 100.0f;
+  float normalizedX = (2.0f * radius) / screenWidth;
+  float normalizedY = (2.0f * radius) / screenHeight;
+  int vert = 52;
+  float step = (2.0f * glm::pi<float>()) / (vert - 2);
+  std::vector<ven::Model::Vertex> vertices{};
+
+  vertices.push_back(ven::Model::Vertex{{0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
+
+  for (int i = 0; i < vert; i++) {
+    float angle = step * i;
+
+    glm::vec2 position = {normalizedX * cos(angle), normalizedY * sin(angle)};
+
+    float hue = glm::mod((angle / (2.0f * glm::pi<float>())) * 360.0f, 360.0f);
+
+    float saturation = 1.0f;
+    float value = 1.0f;
+
+    glm::vec3 color = rgb(hue, saturation, value);
+
+    vertices.push_back(ven::Model::Vertex{position, color});
+  }
+
+  auto venModel = std::make_shared<ven::Model>(venDevice, vertices);
+
+  auto circle = coordinator.createEntity();
+  coordinator.addComponent(circle, ecs::comp::Color{{0.1f, 0.8f, 0.1f}});
+  auto transform2d = ecs::comp::Transform2D{};
+  transform2d.translation.x = 0.2f;
+  coordinator.addComponent(circle, transform2d);
+  coordinator.addComponent(circle, ecs::comp::Model{{venModel}});
 }
 
 void ven::App::createPipelineLayout() {
@@ -121,9 +165,6 @@ void ven::App::freeCmdBuffers() {
 }
 
 void ven::App::recordCmdBuffer(int imageIndex) {
-  static int frame = 0;
-  frame = (frame + 1) % 100;
-
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -160,27 +201,8 @@ void ven::App::recordCmdBuffer(int imageIndex) {
   vkCmdSetViewport(cmdBuffers[imageIndex], 0, 1, &viewport);
   vkCmdSetScissor(cmdBuffers[imageIndex], 0, 1, &scissor);
 
-  venPipeline->bind(cmdBuffers[imageIndex]);
-  venModel->bind(cmdBuffers[imageIndex]);
-
-  for (int j = 0; j < 4; j++) {
-    TempPushConstantData push{};
-    push.offset = {-0.5f + frame * 0.02, -0.4f + j * 0.25f};
-    float hue = glm::mod((frame * 5.0f + j * 60.0f), 360.0f);
-    float saturation = 1.0f;
-    float value = 1.0f;
-    glm::vec3 color = rgb(hue, saturation, value);
-    float brightnessMod = 0.6f + 0.4f * sin(frame * 0.2f + j);
-    color *= brightnessMod;
-    push.color = color;
-
-    vkCmdPushConstants(cmdBuffers[imageIndex], pipelineLayout,
-                       VK_SHADER_STAGE_VERTEX_BIT |
-                           VK_SHADER_STAGE_FRAGMENT_BIT,
-                       0, sizeof(TempPushConstantData), &push);
-
-    venModel->draw(cmdBuffers[imageIndex]);
-  }
+  renderSystem->update(coordinator, venPipeline, pipelineLayout,
+                       cmdBuffers[imageIndex]);
 
   vkCmdEndRenderPass(cmdBuffers[imageIndex]);
   if (vkEndCommandBuffer(cmdBuffers[imageIndex]) != VK_SUCCESS)
@@ -233,34 +255,4 @@ void ven::App::draw() {
   }
   if (result != VK_SUCCESS)
     throw std::runtime_error("Failed to present swap chain image");
-}
-
-void ven::App::loadModels() {
-  int screenWidth = venWindow.getVidMode()->width;
-  int screenHeight = venWindow.getVidMode()->height;
-  float radius = 100.0f;
-  float normalizedX = (2.0f * radius) / screenWidth;
-  float normalizedY = (2.0f * radius) / screenHeight;
-  int vert = 52;
-  float step = (2.0f * glm::pi<float>()) / (vert - 2);
-  std::vector<ven::Model::Vertex> vertices{};
-
-  vertices.push_back(ven::Model::Vertex{{0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
-
-  for (int i = 0; i < vert; i++) {
-    float angle = step * i;
-
-    glm::vec2 position = {normalizedX * cos(angle), normalizedY * sin(angle)};
-
-    float hue = glm::mod((angle / (2.0f * glm::pi<float>())) * 360.0f, 360.0f);
-
-    float saturation = 1.0f;
-    float value = 1.0f;
-
-    glm::vec3 color = rgb(hue, saturation, value);
-
-    vertices.push_back(ven::Model::Vertex{position, color});
-  }
-
-  venModel = std::make_unique<ven::Model>(venDevice, vertices);
 }

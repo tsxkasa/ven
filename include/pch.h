@@ -1,9 +1,9 @@
 #pragma once
 #if defined(_WIN32) || defined(CYGWIN)
-#define NOMINMAX
-#include <Windows.h>
+#  define NOMINMAX
+#  include <Windows.h>
 #elif defined(__linux__)
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 #include <algorithm>
 #include <array>
@@ -38,7 +38,6 @@
 #include <variant>
 #include <vector>
 
-
 #include <fmt/core.h>
 #include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
@@ -55,9 +54,6 @@
 #include <spdlog/common.h>
 #include <stb_image.h>
 #include <vulkan/vulkan.h>
-
-#include "color.h"
-#include "mouse.h"
 
 using Entity = std::uint32_t;
 constexpr Entity MAX_ENTITIES = 5000;

@@ -1,15 +1,23 @@
 #pragma once
 
+#include "coordinator.h"
 #include "pch.h"
+#include "render_system.h"
 #include "ven_device.h"
 #include "ven_model.h"
 #include "ven_pipeline.h"
 #include "ven_swap_chain.h"
 #include "ven_ui.h"
 #include "ven_window.h"
-#include <memory>
+
 
 namespace ven {
+struct TempPushConstantData {
+  glm::mat2 transform{1.0f};
+  glm::vec2 offset;
+  alignas(16) glm::vec3 color; // vec3 requires 16 bytes alignment
+};
+
 class App {
 public:
   App();
@@ -25,7 +33,8 @@ public:
   }
 
 private:
-  void loadModels();
+  void init();
+  void loadObjects();
   void createPipelineLayout();
   void createPipeline();
   void createCmdBuffers();
@@ -41,6 +50,7 @@ private:
   std::unique_ptr<ven::Pipeline> venPipeline;
   VkPipelineLayout pipelineLayout;
   std::vector<VkCommandBuffer> cmdBuffers;
-  std::unique_ptr<ven::Model> venModel;
+  ecs::Coordinator coordinator;
+  std::shared_ptr<ecs::sys::Render> renderSystem;
 };
 } // namespace ven
