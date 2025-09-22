@@ -103,9 +103,11 @@ void ven::App::loadObjects() {
   auto venModel = std::make_shared<ven::Model>(venDevice, vertices);
 
   auto circle = coordinator.createEntity();
-  coordinator.addComponent(circle, ecs::comp::Color{{0.1f, 0.8f, 0.1f}});
+  coordinator.addComponent(circle, ecs::comp::Color{{0.4f, 0.309f, 0.549f}});
   auto transform2d = ecs::comp::Transform2D{};
   transform2d.translation.x = 0.2f;
+  transform2d.scale = {0.2f, 0.5f};
+  transform2d.rotation = 0.25 * glm::two_pi<float>();
   coordinator.addComponent(circle, transform2d);
   coordinator.addComponent(circle, ecs::comp::Model{{venModel}});
 }

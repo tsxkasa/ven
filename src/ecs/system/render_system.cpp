@@ -10,14 +10,17 @@ void ecs::sys::Render::update(ecs::Coordinator& coordinator,
                               VkCommandBuffer& cmdBuffer) {
   pipeline->bind(cmdBuffer);
   for (const auto& ent : entities) {
-    auto& transform = coordinator.getComponent<ecs::comp::Transform2D>(ent);
+    auto& transform2d = coordinator.getComponent<ecs::comp::Transform2D>(ent);
     auto& model = coordinator.getComponent<ecs::comp::Model>(ent);
     auto& color = coordinator.getComponent<ecs::comp::Color>(ent);
 
+    transform2d.rotation =
+        glm::mod(transform2d.rotation + 0.01f, glm::two_pi<float>());
+
     ven::TempPushConstantData push{};
-    push.offset = transform.translation;
+    push.offset = transform2d.translation;
     push.color = color.color;
-    push.transform = transform.mat2();
+    push.transform = transform2d.mat2();
 
     vkCmdPushConstants(cmdBuffer, layout,
                        VK_SHADER_STAGE_VERTEX_BIT |
