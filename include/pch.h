@@ -1,12 +1,13 @@
 #pragma once
 #if defined(_WIN32) || defined(CYGWIN)
-#  define NOMINMAX
-#  include <Windows.h>
+#define NOMINMAX
+#include <Windows.h>
 #elif defined(__linux__)
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cassert>
 #include <cctype>
 #include <chrono>
@@ -30,6 +31,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -58,3 +60,9 @@
 #include "mouse.h"
 
 using Entity = std::uint32_t;
+constexpr Entity MAX_ENTITIES = 5000;
+
+using ComponentType = std::uint8_t;
+const ComponentType MAX_COMPONENTS = 32;
+
+using Signature = std::bitset<MAX_COMPONENTS>;

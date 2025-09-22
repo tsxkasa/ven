@@ -19,6 +19,10 @@ set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include/ven/window"
     "${PROJECT_ROOT_DIR}/include/ven/render"
     "${PROJECT_ROOT_DIR}/include/ven/ui"
+    "${PROJECT_ROOT_DIR}/include/ecs/entity"
+    "${PROJECT_ROOT_DIR}/include/ecs/component"
+    "${PROJECT_ROOT_DIR}/include/ecs/system"
+    "${PROJECT_ROOT_DIR}/include/ecs/core"
 )
 
 # ------------- LOG FILES --------------
@@ -32,6 +36,19 @@ file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_DIR})
 
 set(MAIN_CPP_FILE ${PROJECT_ROOT_DIR}/src/main.cpp)
 set(PCH_FILE_CPP ${PROJECT_ROOT_DIR}/src/pch.cpp)
+
+set(ECS_ENTITY_SOURCES
+)
+
+set(ECS_COMPONENT_SOURCES
+)
+
+set(ECS_SYSTEM_SOURCES
+)
+
+set(ECS_MANAGER_SOURCES
+    "${PROJECT_ROOT_DIR}/src/ecs/core/entity_manager.cpp"
+)
 
 set(VEN_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ven/app/ven_app.cpp"
@@ -47,6 +64,10 @@ set(COMMON_SOURCE_FILES
     ${MAIN_CPP_FILE}
     ${PCH_FILE_CPP}
     ${VEN_SYSTEM_SOURCES}
+    ${ECS_ENTITY_SOURCES}
+    ${ECS_COMPONENT_SOURCES}
+    ${ECS_SYSTEM_SOURCES}
+    ${ECS_MANAGER_SOURCES}
 )
 
 # ------------- SHADER FILES --------------
