@@ -2,7 +2,6 @@
 
 #include "pch.h"
 #include "ven_device.h"
-#include <memory>
 
 namespace ven {
 

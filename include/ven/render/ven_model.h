@@ -2,9 +2,6 @@
 
 #include "pch.h"
 #include "ven_device.h"
-#include <glm/fwd.hpp>
-#include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace ven {
 class Model {

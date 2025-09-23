@@ -44,6 +44,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <GLFW/glfw3.h>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,6 +55,7 @@
 #include <spdlog/common.h>
 #include <stb_image.h>
 #include <vulkan/vulkan.h>
+
 
 using Entity = std::uint32_t;
 constexpr Entity MAX_ENTITIES = 5000;
