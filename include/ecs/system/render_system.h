@@ -18,7 +18,7 @@ namespace ecs {
 namespace sys {
 class Render : public ecs::System {
 public:
-  Render(ven::Device& device, VkRenderPass renderPass);
+  Render(ven::Device& device, VkRenderPass renderPass, ecs::Coordinator& coord);
   ~Render();
 
   Render(const Render&) = delete;
@@ -32,7 +32,7 @@ private:
   ven::Device& venDevice;
   std::unique_ptr<ven::Pipeline> venPipeline;
   VkPipelineLayout pipelineLayout;
-  ecs::Coordinator coordinator;
+  ecs::Coordinator& coordinator;
 };
 } // namespace sys
 } // namespace ecs

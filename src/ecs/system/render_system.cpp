@@ -3,43 +3,10 @@
 #include "model.h"
 #include "transform.h"
 
-glm::vec3 rgb(float h, float s, float v) {
-  float c = v * s; // Chroma
-  float x = c * (1.0f - glm::abs(glm::mod(h / 60.0f, 2.0f) - 1.0f));
-  float m = v - c;
-
-  float r, g, b;
-  if (h >= 0.0f && h < 60.0f) {
-    r = c;
-    g = x;
-    b = 0.0f;
-  } else if (h >= 60.0f && h < 120.0f) {
-    r = x;
-    g = c;
-    b = 0.0f;
-  } else if (h >= 120.0f && h < 180.0f) {
-    r = 0.0f;
-    g = c;
-    b = x;
-  } else if (h >= 180.0f && h < 240.0f) {
-    r = 0.0f;
-    g = x;
-    b = c;
-  } else if (h >= 240.0f && h < 300.0f) {
-    r = x;
-    g = 0.0f;
-    b = c;
-  } else {
-    r = c;
-    g = 0.0f;
-    b = x;
-  }
-
-  return glm::vec3(r + m, g + m, b + m);
-}
-
-ecs::sys::Render::Render(ven::Device& device, VkRenderPass renderPass)
-    : venDevice{device} {
+ecs::sys::Render::Render(ven::Device& device, VkRenderPass renderPass,
+                         ecs::Coordinator& coord)
+    : venDevice{device}
+    , coordinator(coord) {
   createPipelineLayout();
   createPipeline(renderPass);
 }

@@ -39,8 +39,11 @@ glm::vec3 rgb(float h, float s, float v) {
 }
 
 ven::App::App() {
-  init();
-  loadObjects();
+  try {
+    init();
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+  }
 }
 
 void ven::App::init() {
@@ -51,11 +54,13 @@ void ven::App::init() {
   coordinator.registerComponent<ecs::comp::Model>();
 
   renderSystem = coordinator.registerSystem<ecs::sys::Render>(
-      venDevice, venRenderer.getSwapChainRenderPass());
+      venDevice, venRenderer.getSwapChainRenderPass(), coordinator);
   Signature renderSig;
   renderSig.set(coordinator.getComponentType<ecs::comp::Transform2D>());
   renderSig.set(coordinator.getComponentType<ecs::comp::Model>());
   coordinator.setSystemSignature<ecs::sys::Render>(renderSig);
+
+  loadObjects();
 }
 
 ven::App::~App() {}

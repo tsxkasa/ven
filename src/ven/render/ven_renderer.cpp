@@ -12,7 +12,7 @@ ven::Renderer::~Renderer() {
 }
 
 void ven::Renderer::createCmdBuffers() {
-  cmdBuffers.resize(venSwapChain->imageCount());
+  cmdBuffers.resize(ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
 
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -43,13 +43,12 @@ void ven::Renderer::recreateSwapChain() {
   if (!venSwapChain)
     venSwapChain = std::make_unique<ven::SwapChain>(venDevice, extent);
   else {
-    venSwapChain = std::make_unique<ven::SwapChain>(venDevice, extent,
-                                                    std::move(venSwapChain));
+    std::shared_ptr<ven::SwapChain> oldSwapChain = std::move(venSwapChain);
+    venSwapChain =
+        std::make_unique<ven::SwapChain>(venDevice, extent, oldSwapChain);
 
-    if (venSwapChain->imageCount() != cmdBuffers.size()) {
-      freeCmdBuffers();
-      createCmdBuffers();
-    }
+    if (!oldSwapChain->compareSwapFormats(*venSwapChain.get()))
+      throw std::runtime_error("Swap chain image(or depth) format has changed");
   }
   // createPipeline();
 }
@@ -98,6 +97,8 @@ void ven::Renderer::endFrame() {
     throw std::runtime_error("Failed to present swap chain image");
 
   isFrameStarted = false;
+  currentFrameIndex =
+      (currentFrameIndex + 1) % ven::SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
 void ven::Renderer::beginSwapChainRenderPass(VkCommandBuffer cmdBuffer) {

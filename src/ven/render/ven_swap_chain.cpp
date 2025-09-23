@@ -299,6 +299,7 @@ void ven::SwapChain::createFramebuffers() {
 
 void ven::SwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
+  swapchainDepthFormat = depthFormat;
   VkExtent2D swapChainExtent = getSwapChainExtent();
 
   depthImages.resize(imageCount());

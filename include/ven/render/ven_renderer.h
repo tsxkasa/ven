@@ -25,7 +25,13 @@ public:
   inline VkCommandBuffer getCurrentCmdBuffer() const {
     assert(isFrameStarted &&
            "Cannot get command buffer when frame not in progress");
-    return cmdBuffers[currentImageIndex];
+    return cmdBuffers[currentFrameIndex];
+  }
+
+  inline int getFrameIndex() const {
+    assert(isFrameStarted &&
+           "Cannot get frame index when frame not in progress");
+    return currentFrameIndex;
   }
 
   VkCommandBuffer beginFrame();
@@ -43,6 +49,7 @@ private:
   std::vector<VkCommandBuffer> cmdBuffers;
 
   uint32_t currentImageIndex;
+  int currentFrameIndex = 0;
   bool isFrameStarted = false;
 };
 } // namespace ven
