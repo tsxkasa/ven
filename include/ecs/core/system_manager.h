@@ -6,12 +6,12 @@
 namespace ecs {
 class SystemManager {
 public:
-  template <typename T>
-  std::shared_ptr<T> registerSystem() {
+  template <typename T, typename... Args>
+  std::shared_ptr<T> registerSystem(Args&&... args) {
     const char* typeName = typeid(T).name();
     assert(systems.find(typeName) == systems.end() &&
            "Registering system more than once");
-    auto system = std::make_shared<T>();
+    auto system = std::make_shared<T>(std::forward<Args>(args)...);
     systems.insert({typeName, system});
     return system;
   }
@@ -27,7 +27,7 @@ public:
   void entityDestroyed(Entity ent) {
     for (const auto& pair : systems) {
       const auto& system = pair.second;
-      system->entities.erase(ent);
+      system->m_entities.erase(ent);
     }
   }
 
@@ -37,9 +37,9 @@ public:
       const auto& system = pair.second;
       const auto& systemSig = signatures[type];
       if ((sig & systemSig) == systemSig)
-        system->entities.insert(ent);
+        system->m_entities.insert(ent);
       else
-        system->entities.erase(ent);
+        system->m_entities.erase(ent);
     }
   }
 

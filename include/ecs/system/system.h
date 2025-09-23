@@ -3,6 +3,6 @@
 namespace ecs {
 class System {
 public:
-  std::set<Entity> entities;
+  std::set<Entity> m_entities;
 };
 } // namespace ecs

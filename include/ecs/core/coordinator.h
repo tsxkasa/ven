@@ -59,9 +59,9 @@ public:
     return compManager->getComponentType<T>();
   }
 
-  template <typename T>
-  inline std::shared_ptr<T> registerSystem() {
-    return sysManager->registerSystem<T>();
+  template <typename T, typename... Args>
+  inline std::shared_ptr<T> registerSystem(Args&&... args) {
+    return sysManager->registerSystem<T>(std::forward<Args>(args)...);
   }
 
   template <typename T>

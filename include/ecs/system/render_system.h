@@ -3,15 +3,36 @@
 #include "coordinator.h"
 #include "pch.h"
 #include "system.h"
+#include "ven_device.h"
 #include "ven_pipeline.h"
+
+namespace ven {
+struct TempPushConstantData {
+  glm::mat2 transform{1.0f};
+  glm::vec2 offset;
+  alignas(16) glm::vec3 color; // vec3 requires 16 bytes alignment
+};
+} // namespace ven
 
 namespace ecs {
 namespace sys {
 class Render : public ecs::System {
 public:
-  void update(ecs::Coordinator& coordinator,
-              std::unique_ptr<ven::Pipeline>& pipeline,
-              VkPipelineLayout& layout, VkCommandBuffer& cmdBuffer);
+  Render(ven::Device& device, VkRenderPass renderPass);
+  ~Render();
+
+  Render(const Render&) = delete;
+  Render& operator=(const Render&) = delete;
+
+  void update(VkCommandBuffer cmdBuffer);
+
+private:
+  void createPipelineLayout();
+  void createPipeline(VkRenderPass renderPass);
+  ven::Device& venDevice;
+  std::unique_ptr<ven::Pipeline> venPipeline;
+  VkPipelineLayout pipelineLayout;
+  ecs::Coordinator coordinator;
 };
 } // namespace sys
 } // namespace ecs
