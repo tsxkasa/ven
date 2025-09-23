@@ -48,17 +48,16 @@ void ecs::sys::Render::createPipeline(VkRenderPass renderPass) {
 void ecs::sys::Render::update(VkCommandBuffer cmdBuffer) {
   venPipeline->bind(cmdBuffer);
   for (const auto& ent : m_entities) {
-    auto& transform2d = coordinator.getComponent<ecs::comp::Transform2D>(ent);
+    auto& transform3d = coordinator.getComponent<ecs::comp::Transform3D>(ent);
     auto& model = coordinator.getComponent<ecs::comp::Model>(ent);
-    auto& color = coordinator.getComponent<ecs::comp::Color>(ent);
+    // auto& color = coordinator.getComponent<ecs::comp::Color>(ent);
 
-    transform2d.rotation =
-        glm::mod(transform2d.rotation + 0.01f, glm::two_pi<float>());
+    transform3d.rotation.y =
+        glm::mod(transform3d.rotation.y + 0.01f, glm::two_pi<float>());
 
     ven::TempPushConstantData push{};
-    push.offset = transform2d.translation;
-    push.color = color.color;
-    push.transform = transform2d.mat2();
+    // push.color = color.color;
+    push.transform = transform3d.mat4();
 
     vkCmdPushConstants(cmdBuffer, pipelineLayout,
                        VK_SHADER_STAGE_VERTEX_BIT |

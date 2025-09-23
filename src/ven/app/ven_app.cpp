@@ -49,14 +49,14 @@ ven::App::App() {
 void ven::App::init() {
   coordinator.init();
 
-  coordinator.registerComponent<ecs::comp::Transform2D>();
+  coordinator.registerComponent<ecs::comp::Transform3D>();
   coordinator.registerComponent<ecs::comp::Color>();
   coordinator.registerComponent<ecs::comp::Model>();
 
   renderSystem = coordinator.registerSystem<ecs::sys::Render>(
       venDevice, venRenderer.getSwapChainRenderPass(), coordinator);
   Signature renderSig;
-  renderSig.set(coordinator.getComponentType<ecs::comp::Transform2D>());
+  renderSig.set(coordinator.getComponentType<ecs::comp::Transform3D>());
   renderSig.set(coordinator.getComponentType<ecs::comp::Model>());
   coordinator.setSystemSignature<ecs::sys::Render>(renderSig);
 
@@ -79,41 +79,112 @@ void ven::App::run() {
   vkDeviceWaitIdle(venDevice.device());
 }
 
-void ven::App::loadObjects() {
-  int screenWidth = venWindow.getVidMode()->width;
-  int screenHeight = venWindow.getVidMode()->height;
-  float radius = 100.0f;
-  float normalizedX = (2.0f * radius) / screenWidth;
-  float normalizedY = (2.0f * radius) / screenHeight;
-  int vert = 52;
-  float step = (2.0f * glm::pi<float>()) / (vert - 2);
-  std::vector<ven::Model::Vertex> vertices{};
-
-  vertices.push_back(ven::Model::Vertex{{0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
-
-  for (int i = 0; i < vert; i++) {
-    float angle = step * i;
-
-    glm::vec2 position = {normalizedX * cos(angle), normalizedY * sin(angle)};
-
-    float hue = glm::mod((angle / (2.0f * glm::pi<float>())) * 360.0f, 360.0f);
-
-    float saturation = 1.0f;
-    float value = 1.0f;
-
-    glm::vec3 color = rgb(hue, saturation, value);
-
-    vertices.push_back(ven::Model::Vertex{position, color});
+// Takes in file and reads position in format of {float, float, float} in bytes
+std::vector<ven::Model::Vertex> LoadVertices(const char* filepath) {
+  std::vector<ven::Model::Vertex> vertices;
+  std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+  if (!file) {
+    std::cerr << "Failed to open file: " << filepath << "\n";
+    return vertices;
   }
 
-  auto venModel = std::make_shared<ven::Model>(venDevice, vertices);
+  std::streamsize size = file.tellg();
+  if (size % (3 * sizeof(float)) != 0) {
+    std::cerr
+        << "File size is not multiple of vertex position size (3 floats)\n";
+    return vertices;
+  }
 
-  auto circle = coordinator.createEntity();
-  coordinator.addComponent(circle, ecs::comp::Color{{0.4f, 0.309f, 0.549f}});
-  auto transform2d = ecs::comp::Transform2D{};
-  transform2d.translation.x = 0.2f;
-  transform2d.scale = {0.2f, 0.5f};
-  transform2d.rotation = 0.25 * glm::two_pi<float>();
-  coordinator.addComponent(circle, transform2d);
-  coordinator.addComponent(circle, ecs::comp::Model{{venModel}});
+  file.seekg(0, std::ios::beg);
+  size_t vertexCount = size / (3 * sizeof(float));
+  vertices.resize(vertexCount);
+
+  std::vector<float> positions(vertexCount * 3);
+
+  if (!file.read(reinterpret_cast<char*>(positions.data()), size)) {
+    std::cerr << "Failed to read vertex data\n";
+    vertices.clear();
+    return vertices;
+  }
+
+  for (size_t i = 0; i < vertexCount; ++i) {
+    vertices[i].position = glm::vec3(positions[i * 3 + 0], positions[i * 3 + 1],
+                                     positions[i * 3 + 2]);
+
+    // Assign solid red color
+    vertices[i].color = glm::vec3(1.0f, 0.0f, 0.0f);
+  }
+
+  return vertices;
+}
+
+std::unique_ptr<ven::Model> createCubeModel(ven::Device& device,
+                                            glm::vec3 offset) {
+  /*std::vector<ven::Model::Vertex> vertices{
+
+      // left face (white)
+      {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+      // right face (yellow)
+      {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+      // top face (orange, remember y axis points down)
+      {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+      // bottom face (red)
+      {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+      // nose face (blue)
+      {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+      // tail face (green)
+      {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+  }; */
+  auto vertices = LoadVertices("vertices");
+  for (auto& v : vertices) {
+    v.position += offset;
+  }
+  return std::make_unique<ven::Model>(device, vertices);
+}
+
+void ven::App::loadObjects() {
+  std::shared_ptr<ven::Model> venModel =
+      createCubeModel(venDevice, {0.0f, 0.0f, 0.0f});
+  auto cube = coordinator.createEntity();
+  coordinator.addComponent(cube, ecs::comp::Model{venModel});
+  auto transform3d = ecs::comp::Transform3D{};
+  transform3d.translation = {0.0f, 0.0f, 0.5f};
+  transform3d.scale = {0.5f, 0.5f, 0.5f};
+  coordinator.addComponent(cube, transform3d);
 }
