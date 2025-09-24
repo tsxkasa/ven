@@ -152,14 +152,6 @@ void ven::Model::Builder::LoadModel(const std::string& filepath) {
 
   std::unordered_map<ven::Model::Vertex, uint32_t> uniqueVertices{};
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<unsigned int> dst(
-      0, std::numeric_limits<unsigned int>::max());
-
-  float min_float = 0.0f;
-  float max_float = 1.0f;
-
   for (const auto& shape : shapes) {
     for (const auto& index : shape.mesh.indices) {
       ven::Model::Vertex vertex{};
@@ -167,24 +159,10 @@ void ven::Model::Builder::LoadModel(const std::string& filepath) {
         vertex.position = {attrib.vertices[3 * index.vertex_index + 0],
                            attrib.vertices[3 * index.vertex_index + 1],
                            attrib.vertices[3 * index.vertex_index + 2]};
-        unsigned long long colorIndex = 3 * index.vertex_index + 2;
-        if (colorIndex < attrib.colors.size())
-          vertex.color = {attrib.colors[colorIndex - 2],
-                          attrib.colors[colorIndex - 1],
-                          attrib.colors[colorIndex - 0]};
-        else {
-          std::array<float, 3> a;
-          for (int i = 0; i < 3; i++) {
-            unsigned int random_int = dst(gen);
-            float random_float =
-                min_float +
-                (static_cast<float>(random_int) /
-                 static_cast<float>(std::numeric_limits<unsigned int>::max())) *
-                    (max_float - min_float);
-            a[i] = random_float;
-          }
-          vertex.color = glm::vec3{a[0], a[1], a[2]}; // default color is random
-        }
+
+        vertex.color = {attrib.colors[index.vertex_index - 2],
+                        attrib.colors[index.vertex_index - 1],
+                        attrib.colors[index.vertex_index - 0]};
       }
       if (index.normal_index >= 0) {
         vertex.normal = {
