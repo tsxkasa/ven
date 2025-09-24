@@ -38,6 +38,5 @@ private:
       keyboardMovementSystem;
 
   Entity viewerObj;
-  Entity cube;
 };
 } // namespace ven

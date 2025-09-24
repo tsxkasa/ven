@@ -4,6 +4,18 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
+namespace std {
+template <>
+struct hash<ven::Model::Vertex> {
+  size_t operator()(ven::Model::Vertex const& vertex) const {
+    size_t seed = 0;
+    ven::hashCombine(seed, vertex.position, vertex.color, vertex.normal,
+                     vertex.uv);
+    return seed;
+  }
+};
+} // namespace std
+
 ven::Model::Model(ven::Device& device, const ven::Model::Builder& builder)
     : venDevice(device) {
   createVertexBuffers(builder.vertices);
@@ -138,6 +150,8 @@ void ven::Model::Builder::LoadModel(const std::string& filepath) {
   vertices.clear();
   indices.clear();
 
+  std::unordered_map<ven::Model::Vertex, uint32_t> uniqueVertices{};
+
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<unsigned int> dst(
@@ -182,9 +196,12 @@ void ven::Model::Builder::LoadModel(const std::string& filepath) {
         if (index.texcoord_index >= 0)
           vertex.uv = {attrib.texcoords[2 * index.texcoord_index + 0],
                        attrib.texcoords[2 * index.texcoord_index + 1]};
-
+      }
+      if (uniqueVertices.count(vertex) == 0) {
+        uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
         vertices.push_back(vertex);
       }
+      indices.push_back(uniqueVertices[vertex]);
     }
   }
 }

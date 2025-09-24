@@ -2,6 +2,7 @@
 
 #include "pch.h"
 #include "ven_device.h"
+#include "ven_utils.h"
 
 namespace ven {
 class Model {
@@ -15,6 +16,11 @@ public:
     getBindingDescriptions();
     static std::vector<VkVertexInputAttributeDescription>
     getAttributeDescriptions();
+
+    bool operator==(const Vertex& o) const {
+      return position == o.position && color == o.color && normal == o.normal &&
+             uv == o.uv;
+    }
   };
 
   struct Builder {

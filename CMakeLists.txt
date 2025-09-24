@@ -19,6 +19,7 @@ set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include/ven/render"
     "${PROJECT_ROOT_DIR}/include/ven/ui"
     "${PROJECT_ROOT_DIR}/include/ven/camera"
+    "${PROJECT_ROOT_DIR}/include/ven/utils"
     "${PROJECT_ROOT_DIR}/include/ecs/entity"
     "${PROJECT_ROOT_DIR}/include/ecs/component"
     "${PROJECT_ROOT_DIR}/include/ecs/system"
@@ -61,6 +62,7 @@ set(VEN_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_model.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_renderer.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/camera/ven_camera.cpp"
+    "${PROJECT_ROOT_DIR}/src/ven/utils/ven_utils.cpp"
 )
 
 set(COMMON_SOURCE_FILES

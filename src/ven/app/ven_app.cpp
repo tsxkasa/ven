@@ -118,10 +118,10 @@ void ven::App::run() {
 void ven::App::loadObjects() {
   std::shared_ptr<ven::Model> venModel =
       ven::Model::createModel(venDevice, "assets/models/kanade.obj");
-  cube = gCoordinator->createEntity();
-  gCoordinator->addComponent(cube, ecs::comp::Model{venModel});
+  auto object = gCoordinator->createEntity();
+  gCoordinator->addComponent(object, ecs::comp::Model{venModel});
   auto transform3d = ecs::comp::Transform3D{};
   transform3d.translation = {0.0f, 0.0f, 2.5f};
   transform3d.scale = {0.5f, 0.5f, 0.5f};
-  gCoordinator->addComponent(cube, transform3d);
+  gCoordinator->addComponent(object, transform3d);
 }
