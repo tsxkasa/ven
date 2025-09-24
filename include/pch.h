@@ -1,10 +1,4 @@
 #pragma once
-#if defined(_WIN32) || defined(CYGWIN)
-#  define NOMINMAX
-#  include <Windows.h>
-#elif defined(__linux__)
-#  include <unistd.h>
-#endif
 #include <algorithm>
 #include <array>
 #include <bitset>
@@ -55,7 +49,6 @@
 #include <spdlog/common.h>
 #include <stb_image.h>
 #include <vulkan/vulkan.h>
-
 
 using Entity = std::uint32_t;
 constexpr Entity MAX_ENTITIES = 5000;

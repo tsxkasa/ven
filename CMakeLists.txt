@@ -18,6 +18,7 @@ set(PROJECT_INCLUDE_DIR
     "${PROJECT_ROOT_DIR}/include/ven/window"
     "${PROJECT_ROOT_DIR}/include/ven/render"
     "${PROJECT_ROOT_DIR}/include/ven/ui"
+    "${PROJECT_ROOT_DIR}/include/ven/camera"
     "${PROJECT_ROOT_DIR}/include/ecs/entity"
     "${PROJECT_ROOT_DIR}/include/ecs/component"
     "${PROJECT_ROOT_DIR}/include/ecs/system"
@@ -44,6 +45,7 @@ set(ECS_COMPONENT_SOURCES
 
 set(ECS_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ecs/system/render_system.cpp"
+    "${PROJECT_ROOT_DIR}/src/ecs/system/keyboard_movement_controller_system.cpp"
 )
 
 set(ECS_MANAGER_SOURCES
@@ -58,6 +60,7 @@ set(VEN_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_swap_chain.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_model.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_renderer.cpp"
+    "${PROJECT_ROOT_DIR}/src/ven/camera/ven_camera.cpp"
 )
 
 set(COMMON_SOURCE_FILES

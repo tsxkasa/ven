@@ -18,6 +18,10 @@ public:
     return venSwapChain->getRenderPass();
   }
 
+  inline float getAspectRatio() const {
+    return venSwapChain->extentAspectRatio();
+  }
+
   inline bool isFrameInProgress() const {
     return isFrameStarted;
   }

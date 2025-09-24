@@ -3,8 +3,11 @@
 #include "coordinator.h"
 #include "pch.h"
 #include "system.h"
+#include "ven_camera.h"
 #include "ven_device.h"
 #include "ven_pipeline.h"
+
+extern std::unique_ptr<ecs::Coordinator> gCoordinator;
 
 namespace ven {
 struct TempPushConstantData {
@@ -17,13 +20,13 @@ namespace ecs {
 namespace sys {
 class Render : public ecs::System {
 public:
-  Render(ven::Device& device, VkRenderPass renderPass, ecs::Coordinator& coord);
+  Render(ven::Device& device, VkRenderPass renderPass);
   ~Render();
 
   Render(const Render&) = delete;
   Render& operator=(const Render&) = delete;
 
-  void update(VkCommandBuffer cmdBuffer);
+  void update(VkCommandBuffer cmdBuffer, const ven::Camera& camera);
 
 private:
   void createPipelineLayout();
@@ -31,7 +34,6 @@ private:
   ven::Device& venDevice;
   std::unique_ptr<ven::Pipeline> venPipeline;
   VkPipelineLayout pipelineLayout;
-  ecs::Coordinator& coordinator;
 };
 } // namespace sys
 } // namespace ecs

@@ -1,11 +1,5 @@
 #include "ven_pipeline.h"
 #include "ven_model.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <stdexcept>
-#include <vulkan/vulkan_core.h>
-#include <winuser.h>
 
 ven::Pipeline::Pipeline(ven::Device& device, const std::string& vertPath,
                         const std::string& fragPath,

@@ -3,10 +3,8 @@
 #include "model.h"
 #include "transform.h"
 
-ecs::sys::Render::Render(ven::Device& device, VkRenderPass renderPass,
-                         ecs::Coordinator& coord)
-    : venDevice{device}
-    , coordinator(coord) {
+ecs::sys::Render::Render(ven::Device& device, VkRenderPass renderPass)
+    : venDevice{device} {
   createPipelineLayout();
   createPipeline(renderPass);
 }
@@ -45,19 +43,19 @@ void ecs::sys::Render::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
-void ecs::sys::Render::update(VkCommandBuffer cmdBuffer) {
+void ecs::sys::Render::update(VkCommandBuffer cmdBuffer,
+                              const ven::Camera& camera) {
   venPipeline->bind(cmdBuffer);
-  for (const auto& ent : m_entities) {
-    auto& transform3d = coordinator.getComponent<ecs::comp::Transform3D>(ent);
-    auto& model = coordinator.getComponent<ecs::comp::Model>(ent);
-    // auto& color = coordinator.getComponent<ecs::comp::Color>(ent);
 
-    transform3d.rotation.y =
-        glm::mod(transform3d.rotation.y + 0.01f, glm::two_pi<float>());
+  auto projectionView = camera.getProjection() * camera.getView();
+  for (const auto& ent : m_entities) {
+    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
+    auto& model = gCoordinator->getComponent<ecs::comp::Model>(ent);
+    // auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
 
     ven::TempPushConstantData push{};
     // push.color = color.color;
-    push.transform = transform3d.mat4();
+    push.transform = projectionView * transform3d.mat4();
 
     vkCmdPushConstants(cmdBuffer, pipelineLayout,
                        VK_SHADER_STAGE_VERTEX_BIT |

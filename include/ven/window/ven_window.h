@@ -29,10 +29,10 @@ public:
     framebufferResized = false;
   }
 
-  inline const GLFWwindow* getWindow() const {
+  inline GLFWwindow* getWindow() const {
     return window;
   }
-  inline const GLFWmonitor* getMonitor() const {
+  inline GLFWmonitor* getMonitor() const {
     return monitor;
   }
   inline const GLFWvidmode* getVidMode() const {

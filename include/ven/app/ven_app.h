@@ -1,11 +1,14 @@
 #pragma once
 
 #include "coordinator.h"
+#include "keyboard_movement_controller_system.h"
 #include "pch.h"
 #include "render_system.h"
 #include "ven_device.h"
 #include "ven_renderer.h"
 #include "ven_window.h"
+
+extern std::unique_ptr<ecs::Coordinator> gCoordinator;
 
 namespace ven {
 class App {
@@ -30,7 +33,11 @@ private:
   ven::Window venWindow{"App", WIDTH, HEIGHT};
   ven::Device venDevice{venWindow};
   ven::Renderer venRenderer{venWindow, venDevice};
-  ecs::Coordinator coordinator;
   std::shared_ptr<ecs::sys::Render> renderSystem;
+  std::shared_ptr<ecs::sys::KeyboardMovementControllerSystem>
+      keyboardMovementSystem;
+
+  Entity viewerObj;
+  Entity cube;
 };
 } // namespace ven
