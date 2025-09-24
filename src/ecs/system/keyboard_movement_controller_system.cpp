@@ -4,8 +4,7 @@
 void ecs::sys::KeyboardMovementControllerSystem::moveInPlaneXZ(
     GLFWwindow* window, float dt) {
   for (const auto& ent : m_entities) {
-    auto& transform3d =
-        gCoordinator->getComponent<ecs::comp::CameraTransform3D>(ent);
+    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
 
     glm::vec3 rotate{0};
     if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS)

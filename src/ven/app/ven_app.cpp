@@ -50,7 +50,6 @@ ven::App::App() {
 void ven::App::init() {
   gCoordinator->init();
 
-  gCoordinator->registerComponent<ecs::comp::CameraTransform3D>();
   gCoordinator->registerComponent<ecs::comp::Transform3D>();
   gCoordinator->registerComponent<ecs::comp::Color>();
   gCoordinator->registerComponent<ecs::comp::Model>();
@@ -67,7 +66,7 @@ void ven::App::init() {
       gCoordinator
           ->registerSystem<ecs::sys::KeyboardMovementControllerSystem>();
   Signature kbmSig;
-  kbmSig.set(gCoordinator->getComponentType<ecs::comp::CameraTransform3D>());
+  kbmSig.set(gCoordinator->getComponentType<ecs::comp::Transform3D>());
   kbmSig.set(gCoordinator->getComponentType<ecs::comp::Camera>());
   gCoordinator->setSystemSignature<ecs::sys::KeyboardMovementControllerSystem>(
       kbmSig);
@@ -83,7 +82,7 @@ void ven::App::run() {
 
   viewerObj = gCoordinator->createEntity();
   gCoordinator->addComponent(viewerObj, ecs::comp::Camera{});
-  auto camTransform = ecs::comp::CameraTransform3D{};
+  auto camTransform = ecs::comp::Transform3D{};
   gCoordinator->addComponent(viewerObj, camTransform);
 
   auto currentTime = std::chrono::high_resolution_clock::now();
@@ -99,7 +98,7 @@ void ven::App::run() {
 
     keyboardMovementSystem->moveInPlaneXZ(venWindow.getWindow(), dt);
     auto& camTransform =
-        gCoordinator->getComponent<ecs::comp::CameraTransform3D>(viewerObj);
+        gCoordinator->getComponent<ecs::comp::Transform3D>(viewerObj);
     camera.setViewYXZ(camTransform.translation, camTransform.rotation);
 
     float aspect = venRenderer.getAspectRatio();
