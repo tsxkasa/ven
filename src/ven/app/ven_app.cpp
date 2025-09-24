@@ -63,6 +63,15 @@ void ven::App::init() {
   renderSig.set(gCoordinator->getComponentType<ecs::comp::Model>());
   gCoordinator->setSystemSignature<ecs::sys::Render>(renderSig);
 
+  keyboardMovementSystem =
+      gCoordinator
+          ->registerSystem<ecs::sys::KeyboardMovementControllerSystem>();
+  Signature kbmSig;
+  kbmSig.set(gCoordinator->getComponentType<ecs::comp::CameraTransform3D>());
+  kbmSig.set(gCoordinator->getComponentType<ecs::comp::Camera>());
+  gCoordinator->setSystemSignature<ecs::sys::KeyboardMovementControllerSystem>(
+      kbmSig);
+
   loadObjects();
 }
 
@@ -76,15 +85,6 @@ void ven::App::run() {
   gCoordinator->addComponent(viewerObj, ecs::comp::Camera{});
   auto camTransform = ecs::comp::CameraTransform3D{};
   gCoordinator->addComponent(viewerObj, camTransform);
-
-  keyboardMovementSystem =
-      gCoordinator
-          ->registerSystem<ecs::sys::KeyboardMovementControllerSystem>();
-  Signature kbmSig;
-  kbmSig.set(gCoordinator->getComponentType<ecs::comp::CameraTransform3D>());
-  kbmSig.set(gCoordinator->getComponentType<ecs::comp::Camera>());
-  gCoordinator->setSystemSignature<ecs::sys::KeyboardMovementControllerSystem>(
-      kbmSig);
 
   auto currentTime = std::chrono::high_resolution_clock::now();
 
