@@ -8,20 +8,20 @@ class SystemManager {
 public:
   template <typename T, typename... Args>
   std::shared_ptr<T> registerSystem(Args&&... args) {
-    const char* typeName = typeid(T).name();
-    assert(systems.find(typeName) == systems.end() &&
+    std::type_index typeIndex(typeid(T));
+    assert(systems.find(typeIndex) == systems.end() &&
            "Registering system more than once");
     auto system = std::make_shared<T>(std::forward<Args>(args)...);
-    systems.insert({typeName, system});
+    systems.insert({typeIndex, system});
     return system;
   }
 
   template <typename T>
   void setSignature(Signature sig) {
-    const char* typeName = typeid(T).name();
-    assert(systems.find(typeName) != systems.end() &&
+    std::type_index typeIndex(typeid(T));
+    assert(systems.find(typeIndex) != systems.end() &&
            "System used before registered");
-    signatures.insert({typeName, sig});
+    signatures.insert({typeIndex, sig});
   }
 
   void entityDestroyed(Entity ent) {
@@ -44,7 +44,7 @@ public:
   }
 
 private:
-  std::unordered_map<const char*, Signature> signatures{};
-  std::unordered_map<const char*, std::shared_ptr<System>> systems{};
+  std::unordered_map<std::type_index, Signature> signatures{};
+  std::unordered_map<std::type_index, std::shared_ptr<System>> systems{};
 };
 } // namespace ecs

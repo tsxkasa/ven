@@ -8,25 +8,25 @@ class ComponentManager {
 public:
   template <typename T>
   void registerComponent() {
-    const char* typeName = typeid(T).name();
+    std::type_index typeIndex(typeid(T));
 
-    assert(componentTypes.find(typeName) == componentTypes.end() &&
+    assert(componentTypes.find(typeIndex) == componentTypes.end() &&
            "Registering component type more than once");
 
-    componentTypes.insert({typeName, nextComponentType});
+    componentTypes.insert({typeIndex, nextComponentType});
     componentArrays.insert(
-        {typeName, std::make_shared<ecs::ComponentArray<T>>()});
+        {typeIndex, std::make_shared<ecs::ComponentArray<T>>()});
 
     nextComponentType++;
   }
 
   template <typename T>
   ComponentType getComponentType() {
-    const char* typeName = typeid(T).name();
-    assert(componentTypes.find(typeName) != componentTypes.end() &&
+    std::type_index typeIndex(typeid(T));
+    assert(componentTypes.find(typeIndex) != componentTypes.end() &&
            "Component not registered before use");
 
-    return componentTypes[typeName];
+    return componentTypes[typeIndex];
   }
 
   template <typename T>
@@ -53,19 +53,19 @@ public:
   }
 
 private:
-  std::unordered_map<const char*, ComponentType> componentTypes{};
-  std::unordered_map<const char*, std::shared_ptr<ecs::IComponentArray>>
+  std::unordered_map<std::type_index, ComponentType> componentTypes{};
+  std::unordered_map<std::type_index, std::shared_ptr<ecs::IComponentArray>>
       componentArrays{};
   ComponentType nextComponentType{};
 
   template <typename T>
   std::shared_ptr<ecs::ComponentArray<T>> getComponentArray() {
-    const char* typeName = typeid(T).name();
+    std::type_index typeIndex(typeid(T));
 
-    assert(componentTypes.find(typeName) != componentTypes.end() &&
+    assert(componentTypes.find(typeIndex) != componentTypes.end() &&
            "Component not registered before use");
     return std::static_pointer_cast<ecs::ComponentArray<T>>(
-        componentArrays[typeName]);
+        componentArrays[typeIndex]);
   }
 };
 } // namespace ecs

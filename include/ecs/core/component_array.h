@@ -9,7 +9,8 @@ public:
   virtual void entityDestroyed(Entity ent) = 0;
 };
 
-template <typename T> class ComponentArray : public IComponentArray {
+template <typename T>
+class ComponentArray : public IComponentArray {
 public:
   void insertData(Entity ent, T comp) {
     assert(entityToIndexMap.find(ent) == entityToIndexMap.end() &&
@@ -19,6 +20,7 @@ public:
     entityToIndexMap[ent] = newIndex;
     indexToEntityMap[newIndex] = ent;
     componentArray[newIndex] = comp;
+    size++;
   }
 
   void removeData(Entity ent) {
@@ -39,7 +41,7 @@ public:
     size--;
   }
 
-  inline T &getData(Entity ent) {
+  inline T& getData(Entity ent) {
     assert(entityToIndexMap.find(ent) != entityToIndexMap.end() &&
            "Retrieving non-existent component");
 
