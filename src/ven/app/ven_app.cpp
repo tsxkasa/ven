@@ -116,9 +116,7 @@ void ven::App::run() {
 }
 
 // Takes in file and reads position in format of {float, float, float} in bytes
-std::vector<ven::Model::Vertex>
-LoadVertices(const char* filepath,
-             glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f)) {
+std::vector<ven::Model::Vertex> LoadVertices(const char* filepath) {
   std::vector<ven::Model::Vertex> vertices;
   std::ifstream file(filepath, std::ios::binary | std::ios::ate);
   if (!file) {
@@ -149,71 +147,117 @@ LoadVertices(const char* filepath,
     vertices[i].position = glm::vec3(positions[i * 3 + 0], positions[i * 3 + 1],
                                      positions[i * 3 + 2]);
 
-    // Assign solid red color
-    vertices[i].color = color;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned int> dst(
+        0, std::numeric_limits<unsigned int>::max());
+
+    float min_float = 0.0f;
+    float max_float = 1.0f;
+    std::array<float, 3> a;
+    for (int i = 0; i < 3; i++) {
+      unsigned int random_int = dst(gen);
+      float random_float =
+          min_float +
+          (static_cast<float>(random_int) /
+           static_cast<float>(std::numeric_limits<unsigned int>::max())) *
+              (max_float - min_float);
+      a[i] = random_float;
+    }
+
+    vertices[i].color = glm::vec3{a[0], a[1], a[2]};
   }
 
   return vertices;
 }
 
+// Takes in file and reads indices in format of {uint32} in bytes
+std::vector<uint32_t> LoadIndices(const char* filepath) {
+  std::vector<uint32_t> indices;
+  std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+  if (!file) {
+    std::cerr << "Failed to open file: " << filepath << "\n";
+    return indices;
+  }
+
+  std::streamsize size = file.tellg();
+  if (size % (sizeof(uint32_t)) != 0) {
+    std::cerr << "File size is not multiple of index position size (1 int)\n";
+    return indices;
+  }
+
+  file.seekg(0, std::ios::beg);
+  size_t indexCount = size / (sizeof(uint32_t));
+  indices.resize(indexCount);
+
+  std::vector<int> rawInd(indexCount);
+
+  if (!file.read(reinterpret_cast<char*>(rawInd.data()), size)) {
+    std::cerr << "Failed to read indices data\n";
+    indices.clear();
+    return indices;
+  }
+
+  for (auto& i : rawInd) {
+    indices.push_back(i);
+  }
+
+  return indices;
+}
+
 std::unique_ptr<ven::Model> createCubeModel(ven::Device& device,
                                             glm::vec3 offset) {
-  // std::vector<ven::Model::Vertex> vertices{
-
+  ven::Model::Builder modelBuilder{};
+  // modelBuilder.vertices = {
   //     // left face (white)
   //     {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
   //     {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
   //     {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-  //     {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
   //     {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-  //     {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
 
   //     // right face (yellow)
   //     {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
   //     {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
   //     {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-  //     {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
   //     {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-  //     {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
 
   //     // top face (orange, remember y axis points down)
   //     {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
   //     {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
   //     {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-  //     {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
   //     {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-  //     {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
 
   //     // bottom face (red)
   //     {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
   //     {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
   //     {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-  //     {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
   //     {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-  //     {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
 
   //     // nose face (blue)
   //     {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
   //     {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
   //     {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-  //     {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
   //     {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-  //     {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
 
   //     // tail face (green)
   //     {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
   //     {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
   //     {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-  //     {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
   //     {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-  //     {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-
   // };
-  auto vertices = LoadVertices("vertices");
-  for (auto& v : vertices) {
+
+  modelBuilder.vertices = LoadVertices("assets/models/kanade_v");
+  modelBuilder.indices = LoadIndices("assets/models/kanade_i");
+
+  for (auto& v : modelBuilder.vertices) {
     v.position += offset;
   }
-  return std::make_unique<ven::Model>(device, vertices);
+
+  // modelBuilder.indices = {0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,
+  //                         8,  9,  10, 8,  11, 9,  12, 13, 14, 12, 15, 13,
+  //                         16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21};
+
+  return std::make_unique<ven::Model>(device, modelBuilder);
 }
 
 void ven::App::loadObjects() {

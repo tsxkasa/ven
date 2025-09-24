@@ -15,16 +15,27 @@ public:
     getAttributeDescriptions();
   };
 
+  struct Builder {
+    std::vector<ven::Model::Vertex> vertices{};
+    std::vector<uint32_t> indices{};
+  };
+
 private:
   ven::Device& venDevice;
   VkBuffer vertexBuffer;
   VkDeviceMemory vertexBufferMemory;
   uint32_t vertexCount;
 
+  bool hasIndexBuffer = false;
+  VkBuffer indexBuffer;
+  VkDeviceMemory indexBufferMemory;
+  uint32_t indexCount;
+
   void createVertexBuffers(const std::vector<Vertex>& vertices);
+  void createIndexBuffer(const std::vector<uint32_t>& indices);
 
 public:
-  Model(ven::Device& device, const std::vector<Vertex>& vertices);
+  Model(ven::Device& device, const ven::Model::Builder& builder);
   ~Model();
 
   Model(const Model&) = delete;
