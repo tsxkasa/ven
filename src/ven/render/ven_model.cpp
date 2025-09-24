@@ -82,7 +82,7 @@ void ven::Model::draw(VkCommandBuffer cmdBuffer) {
   if (hasIndexBuffer)
     vkCmdDrawIndexed(cmdBuffer, indexCount, 1, 0, 0, 0);
   else
-    vkCmdDraw(cmdBuffer, indexCount, 1, 0, 0);
+    vkCmdDraw(cmdBuffer, vertexCount, 1, 0, 0);
 }
 
 void ven::Model::bind(VkCommandBuffer cmdBuffer) {
@@ -116,4 +116,75 @@ ven::Model::Vertex::getAttributeDescriptions() {
   attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
   attributeDescriptions[1].offset = offsetof(Vertex, color);
   return attributeDescriptions;
+}
+
+std::unique_ptr<ven::Model>
+ven::Model::createModel(ven::Device& device, const std::string& filepath) {
+  ven::Model::Builder builder{};
+  builder.LoadModel(filepath);
+  fmt::println("Vertex count: {}", builder.vertices.size());
+  return std::make_unique<ven::Model>(device, builder);
+}
+
+void ven::Model::Builder::LoadModel(const std::string& filepath) {
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> mats;
+  std::string warn, err;
+
+  if (!tinyobj::LoadObj(&attrib, &shapes, &mats, &warn, &err, filepath.c_str()))
+    throw std::runtime_error(warn + err);
+
+  vertices.clear();
+  indices.clear();
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<unsigned int> dst(
+      0, std::numeric_limits<unsigned int>::max());
+
+  float min_float = 0.0f;
+  float max_float = 1.0f;
+
+  for (const auto& shape : shapes) {
+    for (const auto& index : shape.mesh.indices) {
+      ven::Model::Vertex vertex{};
+      if (index.vertex_index >= 0) {
+        vertex.position = {attrib.vertices[3 * index.vertex_index + 0],
+                           attrib.vertices[3 * index.vertex_index + 1],
+                           attrib.vertices[3 * index.vertex_index + 2]};
+        unsigned long long colorIndex = 3 * index.vertex_index + 2;
+        if (colorIndex < attrib.colors.size())
+          vertex.color = {attrib.colors[colorIndex - 2],
+                          attrib.colors[colorIndex - 1],
+                          attrib.colors[colorIndex - 0]};
+        else {
+          std::array<float, 3> a;
+          for (int i = 0; i < 3; i++) {
+            unsigned int random_int = dst(gen);
+            float random_float =
+                min_float +
+                (static_cast<float>(random_int) /
+                 static_cast<float>(std::numeric_limits<unsigned int>::max())) *
+                    (max_float - min_float);
+            a[i] = random_float;
+          }
+          vertex.color = glm::vec3{a[0], a[1], a[2]}; // default color is random
+        }
+      }
+      if (index.normal_index >= 0) {
+        vertex.normal = {
+            attrib.normals[3 * index.normal_index + 0],
+            attrib.normals[3 * index.normal_index + 1],
+            attrib.normals[3 * index.normal_index + 2],
+        };
+
+        if (index.texcoord_index >= 0)
+          vertex.uv = {attrib.texcoords[2 * index.texcoord_index + 0],
+                       attrib.texcoords[2 * index.texcoord_index + 1]};
+
+        vertices.push_back(vertex);
+      }
+    }
+  }
 }

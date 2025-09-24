@@ -35,6 +35,8 @@
 #include <vector>
 
 #include <fmt/core.h>
+#define TINYOBJECTLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 #include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS

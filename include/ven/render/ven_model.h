@@ -7,8 +7,10 @@ namespace ven {
 class Model {
 public:
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec3 position{};
+    glm::vec3 color{};
+    glm::vec3 normal{};
+    glm::vec2 uv{};
     static std::vector<VkVertexInputBindingDescription>
     getBindingDescriptions();
     static std::vector<VkVertexInputAttributeDescription>
@@ -18,6 +20,29 @@ public:
   struct Builder {
     std::vector<ven::Model::Vertex> vertices{};
     std::vector<uint32_t> indices{};
+
+    /*
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned int> dst(
+        0, std::numeric_limits<unsigned int>::max());
+
+    float min_float = 0.0f;
+    float max_float = 1.0f;
+    std::array<float, 3> a;
+    for (int i = 0; i < 3; i++) {
+      unsigned int random_int = dst(gen);
+      float random_float =
+          min_float +
+          (static_cast<float>(random_int) /
+           static_cast<float>(std::numeric_limits<unsigned int>::max())) *
+              (max_float - min_float);
+      a[i] = random_float;
+    }
+
+    vertex.color = glm::vec3{a[0], a[1], a[2]};
+    */
+    void LoadModel(const std::string& filepath);
   };
 
 private:
@@ -43,5 +68,7 @@ public:
 
   void bind(VkCommandBuffer cmdBuffer);
   void draw(VkCommandBuffer cmdBuffer);
+  static std::unique_ptr<ven::Model> createModel(ven::Device& device,
+                                                 const std::string& filepath);
 };
 } // namespace ven

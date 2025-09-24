@@ -116,6 +116,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 
 target_link_libraries(ven
     PRIVATE
@@ -125,7 +126,9 @@ target_link_libraries(ven
         glfw
         spdlog::spdlog
         imgui::imgui
+        tinyobjloader::tinyobjloader
 )
+
 
 # Set output directory for the executable
 set_target_properties(ven PROPERTIES
