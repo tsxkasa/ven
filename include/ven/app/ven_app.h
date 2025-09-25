@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "render_system.h"
 #include "ven_buffer.h"
+#include "ven_descriptors.h"
 #include "ven_device.h"
 #include "ven_renderer.h"
 #include "ven_window.h"
@@ -42,6 +43,8 @@ private:
   std::shared_ptr<ecs::sys::Render> renderSystem;
   std::shared_ptr<ecs::sys::KeyboardMovementControllerSystem>
       keyboardMovementSystem;
+  std::unique_ptr<ven::DescriptorPool> globalPool{};
+  std::unique_ptr<ven::DescriptorSetLayout> globalSetLayout;
 
   Entity viewerObj;
 };

@@ -9,5 +9,6 @@ struct FrameInfo {
   float dt;
   VkCommandBuffer cmdBuffer;
   ven::Camera& camera;
+  VkDescriptorSet globalDescriptorSet;
 };
 } // namespace ven

@@ -48,6 +48,11 @@ ven::App::App() {
 }
 
 void ven::App::init() {
+  globalSetLayout = ven::DescriptorSetLayout::Builder(venDevice)
+                        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                    VK_SHADER_STAGE_VERTEX_BIT)
+                        .build();
+
   gCoordinator->init();
 
   gCoordinator->registerComponent<ecs::comp::Transform3D>();
@@ -56,7 +61,8 @@ void ven::App::init() {
   gCoordinator->registerComponent<ecs::comp::Camera>();
 
   renderSystem = gCoordinator->registerSystem<ecs::sys::Render>(
-      venDevice, venRenderer.getSwapChainRenderPass());
+      venDevice, venRenderer.getSwapChainRenderPass(),
+      globalSetLayout->getDescriptorSetLayout());
   Signature renderSig;
   renderSig.set(gCoordinator->getComponentType<ecs::comp::Transform3D>());
   renderSig.set(gCoordinator->getComponentType<ecs::comp::Model>());
@@ -70,6 +76,12 @@ void ven::App::init() {
   kbmSig.set(gCoordinator->getComponentType<ecs::comp::Camera>());
   gCoordinator->setSystemSignature<ecs::sys::KeyboardMovementControllerSystem>(
       kbmSig);
+
+  globalPool = ven::DescriptorPool::Builder(venDevice)
+                   .setMaxSets(ven::SwapChain::MAX_FRAMES_IN_FLIGHT)
+                   .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                ven::SwapChain::MAX_FRAMES_IN_FLIGHT)
+                   .build();
 
   loadObjects();
 }
@@ -85,6 +97,15 @@ void ven::App::run() {
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     UBOBuffers[i]->map();
+  }
+
+  std::vector<VkDescriptorSet> globalDescriptorSets(
+      ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
+  for (size_t i = 0; i < globalDescriptorSets.size(); i++) {
+    auto bufferInfo = UBOBuffers[i]->descriptorInfo();
+    ven::DescriptorWriter(*globalSetLayout, *globalPool)
+        .writeBuffer(0, &bufferInfo)
+        .build(globalDescriptorSets[i]);
   }
 
   ven::Camera camera{};
@@ -116,7 +137,8 @@ void ven::App::run() {
 
     if (auto cmdBuffer = venRenderer.beginFrame()) {
       int frameIndex = venRenderer.getFrameIndex();
-      ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera};
+      ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera,
+                               globalDescriptorSets[frameIndex]};
       ven::GlobalUBO UBO{};
       UBO.projectionView = camera.getProjection() * camera.getView();
       UBOBuffers[frameIndex]->writeToBuffer(&UBO);
