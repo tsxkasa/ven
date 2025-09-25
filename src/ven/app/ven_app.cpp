@@ -77,6 +77,16 @@ void ven::App::init() {
 ven::App::~App() {}
 
 void ven::App::run() {
+  std::vector<std::unique_ptr<ven::Buffer>> UBOBuffers(
+      ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
+  for (size_t i = 0; i < UBOBuffers.size(); i++) {
+    UBOBuffers[i] = std::make_unique<ven::Buffer>(
+        venDevice, sizeof(GlobalUBO), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+    UBOBuffers[i]->map();
+  }
+
   ven::Camera camera{};
   camera.setViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
 
@@ -105,8 +115,15 @@ void ven::App::run() {
     camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
     if (auto cmdBuffer = venRenderer.beginFrame()) {
+      int frameIndex = venRenderer.getFrameIndex();
+      ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera};
+      ven::GlobalUBO UBO{};
+      UBO.projectionView = camera.getProjection() * camera.getView();
+      UBOBuffers[frameIndex]->writeToBuffer(&UBO);
+      UBOBuffers[frameIndex]->flush();
+
       venRenderer.beginSwapChainRenderPass(cmdBuffer);
-      renderSystem->update(cmdBuffer, camera);
+      renderSystem->update(frameInfo);
       venRenderer.endSwapChainRenderPass(cmdBuffer);
       venRenderer.endFrame();
     }

@@ -61,9 +61,9 @@ set(VEN_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_swap_chain.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_model.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/render/ven_renderer.cpp"
+    "${PROJECT_ROOT_DIR}/src/ven/render/ven_buffer.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/camera/ven_camera.cpp"
     "${PROJECT_ROOT_DIR}/src/ven/utils/ven_utils.cpp"
-    "${PROJECT_ROOT_DIR}/src/ven/utils/ven_buffer.cpp"
 )
 
 set(COMMON_SOURCE_FILES

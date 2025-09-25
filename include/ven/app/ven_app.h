@@ -4,6 +4,7 @@
 #include "keyboard_movement_controller_system.h"
 #include "pch.h"
 #include "render_system.h"
+#include "ven_buffer.h"
 #include "ven_device.h"
 #include "ven_renderer.h"
 #include "ven_window.h"
@@ -11,6 +12,11 @@
 extern std::unique_ptr<ecs::Coordinator> gCoordinator;
 
 namespace ven {
+struct GlobalUBO {
+  glm::mat4 projectionView{1.0f};
+  glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, -1.0f});
+};
+
 class App {
 public:
   App();

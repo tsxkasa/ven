@@ -43,11 +43,11 @@ void ecs::sys::Render::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
-void ecs::sys::Render::update(VkCommandBuffer cmdBuffer,
-                              const ven::Camera& camera) {
-  venPipeline->bind(cmdBuffer);
+void ecs::sys::Render::update(ven::FrameInfo& frameInfo) {
+  venPipeline->bind(frameInfo.cmdBuffer);
 
-  auto projectionView = camera.getProjection() * camera.getView();
+  auto projectionView =
+      frameInfo.camera.getProjection() * frameInfo.camera.getView();
   for (const auto& ent : m_entities) {
     auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
     auto& model = gCoordinator->getComponent<ecs::comp::Model>(ent);
@@ -59,12 +59,12 @@ void ecs::sys::Render::update(VkCommandBuffer cmdBuffer,
     push.transform = projectionView * modelMat;
     push.normalMatrix = transform3d.normalMatrix();
 
-    vkCmdPushConstants(cmdBuffer, pipelineLayout,
+    vkCmdPushConstants(frameInfo.cmdBuffer, pipelineLayout,
                        VK_SHADER_STAGE_VERTEX_BIT |
                            VK_SHADER_STAGE_FRAGMENT_BIT,
                        0, sizeof(ven::TempPushConstantData), &push);
 
-    model.model->bind(cmdBuffer);
-    model.model->draw(cmdBuffer);
+    model.model->bind(frameInfo.cmdBuffer);
+    model.model->draw(frameInfo.cmdBuffer);
   }
 }

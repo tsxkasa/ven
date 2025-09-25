@@ -5,6 +5,7 @@
 #include "system.h"
 #include "ven_camera.h"
 #include "ven_device.h"
+#include "ven_frame_info.h"
 #include "ven_pipeline.h"
 
 extern std::unique_ptr<ecs::Coordinator> gCoordinator;
@@ -26,7 +27,7 @@ public:
   Render(const Render&) = delete;
   Render& operator=(const Render&) = delete;
 
-  void update(VkCommandBuffer cmdBuffer, const ven::Camera& camera);
+  void update(ven::FrameInfo& frameInfo);
 
 private:
   void createPipelineLayout();
