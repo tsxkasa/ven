@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include "ven_buffer.h"
 #include "ven_device.h"
 #include "ven_utils.h"
 
@@ -53,13 +54,11 @@ public:
 
 private:
   ven::Device& venDevice;
-  VkBuffer vertexBuffer;
-  VkDeviceMemory vertexBufferMemory;
+  std::unique_ptr<ven::Buffer> vertexBuffer;
   uint32_t vertexCount;
 
   bool hasIndexBuffer = false;
-  VkBuffer indexBuffer;
-  VkDeviceMemory indexBufferMemory;
+  std::unique_ptr<ven::Buffer> indexBuffer;
   uint32_t indexCount;
 
   void createVertexBuffers(const std::vector<Vertex>& vertices);

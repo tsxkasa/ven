@@ -22,42 +22,29 @@ ven::Model::Model(ven::Device& device, const ven::Model::Builder& builder)
   createIndexBuffer(builder.indices);
 }
 
-ven::Model::~Model() {
-  vkDestroyBuffer(venDevice.device(), vertexBuffer, nullptr);
-  vkFreeMemory(venDevice.device(), vertexBufferMemory, nullptr);
-  if (hasIndexBuffer) {
-    vkDestroyBuffer(venDevice.device(), indexBuffer, nullptr);
-    vkFreeMemory(venDevice.device(), indexBufferMemory, nullptr);
-  }
-}
+ven::Model::~Model() {}
 
 void ven::Model::createVertexBuffers(const std::vector<Vertex>& vertices) {
   vertexCount = static_cast<uint32_t>(vertices.size());
   assert(vertexCount >= 3 && "Vertex Count must be atleast 3");
   VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+  uint32_t vertexSize = sizeof(vertices[0]);
 
-  VkBuffer stagingBuffer;
-  VkDeviceMemory stagingBufferMemory;
+  ven::Buffer stagingBuffer{venDevice, vertexSize, vertexCount,
+                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 
-  venDevice.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                         stagingBuffer, stagingBufferMemory);
+  stagingBuffer.map();
+  stagingBuffer.writeToBuffer((void*)vertices.data());
 
-  void* data;
-  vkMapMemory(venDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-  memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-  vkUnmapMemory(venDevice.device(), stagingBufferMemory);
-
-  venDevice.createBuffer(
-      bufferSize,
+  vertexBuffer = std::make_unique<ven::Buffer>(
+      venDevice, vertexSize, vertexCount,
       VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-  venDevice.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-  vkDestroyBuffer(venDevice.device(), stagingBuffer, nullptr);
-  vkFreeMemory(venDevice.device(), stagingBufferMemory, nullptr);
+  venDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(),
+                       bufferSize);
 }
 
 void ven::Model::createIndexBuffer(const std::vector<uint32_t>& indices) {
@@ -66,28 +53,27 @@ void ven::Model::createIndexBuffer(const std::vector<uint32_t>& indices) {
   if (!hasIndexBuffer)
     return;
   VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
-  VkBuffer stagingBuffer;
-  VkDeviceMemory stagingBufferMemory;
+  uint32_t indexSize = sizeof(indices[0]);
 
-  venDevice.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                         stagingBuffer, stagingBufferMemory);
+  ven::Buffer stagingBuffer{
+      venDevice,
+      indexSize,
+      indexCount,
+      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+  };
 
-  void* data;
-  vkMapMemory(venDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-  memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-  vkUnmapMemory(venDevice.device(), stagingBufferMemory);
+  stagingBuffer.map();
+  stagingBuffer.writeToBuffer((void*)indices.data());
 
-  venDevice.createBuffer(
-      bufferSize,
+  indexBuffer = std::make_unique<ven::Buffer>(
+      venDevice, indexSize, indexCount,
       VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-  venDevice.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-  vkDestroyBuffer(venDevice.device(), stagingBuffer, nullptr);
-  vkFreeMemory(venDevice.device(), stagingBufferMemory, nullptr);
+  venDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(),
+                       bufferSize);
 }
 
 void ven::Model::draw(VkCommandBuffer cmdBuffer) {
@@ -98,12 +84,13 @@ void ven::Model::draw(VkCommandBuffer cmdBuffer) {
 }
 
 void ven::Model::bind(VkCommandBuffer cmdBuffer) {
-  VkBuffer buffers[] = {vertexBuffer};
+  VkBuffer buffers[] = {vertexBuffer->getBuffer()};
   VkDeviceSize offsets[] = {0};
   vkCmdBindVertexBuffers(cmdBuffer, 0, 1, buffers, offsets);
 
   if (hasIndexBuffer)
-    vkCmdBindIndexBuffer(cmdBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(cmdBuffer, indexBuffer->getBuffer(), 0,
+                         VK_INDEX_TYPE_UINT32);
 }
 
 std::vector<VkVertexInputBindingDescription>
