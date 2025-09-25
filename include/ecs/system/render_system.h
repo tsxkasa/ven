@@ -12,7 +12,7 @@ extern std::unique_ptr<ecs::Coordinator> gCoordinator;
 namespace ven {
 struct TempPushConstantData {
   glm::mat4 transform{1.0f};
-  glm::mat4 modelMatrix{1.0f};
+  glm::mat4 normalMatrix{1.0f};
 };
 } // namespace ven
 
