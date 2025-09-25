@@ -55,7 +55,9 @@ void ecs::sys::Render::update(VkCommandBuffer cmdBuffer,
 
     ven::TempPushConstantData push{};
     // push.color = color.color;
-    push.transform = projectionView * transform3d.mat4();
+    auto modelMat = transform3d.mat4();
+    push.transform = projectionView * modelMat;
+    push.modelMatrix = modelMat;
 
     vkCmdPushConstants(cmdBuffer, pipelineLayout,
                        VK_SHADER_STAGE_VERTEX_BIT |
