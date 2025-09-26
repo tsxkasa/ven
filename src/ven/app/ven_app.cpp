@@ -2,6 +2,7 @@
 #include "camera.h"
 #include "colors.h"
 #include "model.h"
+#include "point_light.h"
 #include "transform.h"
 
 glm::vec3 rgb(float h, float s, float v) {
@@ -59,6 +60,7 @@ void ven::App::init() {
   gCoordinator->registerComponent<ecs::comp::Color>();
   gCoordinator->registerComponent<ecs::comp::Model>();
   gCoordinator->registerComponent<ecs::comp::Camera>();
+  gCoordinator->registerComponent<ecs::comp::PointLight>();
 
   renderSystem = gCoordinator->registerSystem<ecs::sys::Render>(
       venDevice, venRenderer.getSwapChainRenderPass(),
@@ -71,6 +73,11 @@ void ven::App::init() {
   pointLightSystem = gCoordinator->registerSystem<ecs::sys::PointLight>(
       venDevice, venRenderer.getSwapChainRenderPass(),
       globalSetLayout->getDescriptorSetLayout());
+  Signature pointLightSig;
+  pointLightSig.set(gCoordinator->getComponentType<ecs::comp::Transform3D>());
+  pointLightSig.set(gCoordinator->getComponentType<ecs::comp::PointLight>());
+  pointLightSig.set(gCoordinator->getComponentType<ecs::comp::Color>());
+  gCoordinator->setSystemSignature<ecs::sys::PointLight>(pointLightSig);
 
   keyboardMovementSystem =
       gCoordinator
@@ -93,20 +100,20 @@ void ven::App::init() {
 ven::App::~App() {}
 
 void ven::App::run() {
-  std::vector<std::unique_ptr<ven::Buffer>> UBOBuffers(
+  std::vector<std::unique_ptr<ven::Buffer>> uboBuffers(
       ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
-  for (size_t i = 0; i < UBOBuffers.size(); i++) {
-    UBOBuffers[i] = std::make_unique<ven::Buffer>(
+  for (size_t i = 0; i < uboBuffers.size(); i++) {
+    uboBuffers[i] = std::make_unique<ven::Buffer>(
         venDevice, sizeof(GlobalUBO), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    UBOBuffers[i]->map();
+    uboBuffers[i]->map();
   }
 
   std::vector<VkDescriptorSet> globalDescriptorSets(
       ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
   for (size_t i = 0; i < globalDescriptorSets.size(); i++) {
-    auto bufferInfo = UBOBuffers[i]->descriptorInfo();
+    auto bufferInfo = uboBuffers[i]->descriptorInfo();
     ven::DescriptorWriter(*globalSetLayout, *globalPool)
         .writeBuffer(0, &bufferInfo)
         .build(globalDescriptorSets[i]);
@@ -143,15 +150,16 @@ void ven::App::run() {
       int frameIndex = venRenderer.getFrameIndex();
       ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera,
                                globalDescriptorSets[frameIndex]};
-      ven::GlobalUBO UBO{};
-      UBO.projection = camera.getProjection();
-      UBO.view = camera.getView();
-      UBOBuffers[frameIndex]->writeToBuffer(&UBO);
-      UBOBuffers[frameIndex]->flush();
+      ven::GlobalUBO ubo{};
+      ubo.projection = camera.getProjection();
+      ubo.view = camera.getView();
+      pointLightSystem->update(ubo);
+      uboBuffers[frameIndex]->writeToBuffer(&ubo);
+      uboBuffers[frameIndex]->flush();
 
       venRenderer.beginSwapChainRenderPass(cmdBuffer);
       renderSystem->update(frameInfo);
-      pointLightSystem->update(frameInfo);
+      pointLightSystem->draw(frameInfo);
       venRenderer.endSwapChainRenderPass(cmdBuffer);
       venRenderer.endFrame();
     }
@@ -169,4 +177,11 @@ void ven::App::loadObjects() {
   transform3d.translation = {0.0f, 0.0f, 2.5f};
   transform3d.scale = {0.5f, 0.5f, 0.5f};
   gCoordinator->addComponent(object, transform3d);
+
+  auto pointLight = gCoordinator->createEntity();
+  gCoordinator->addComponent(
+      pointLight,
+      ecs::comp::Transform3D{{0.0f, 0.0f, 0.0f}, {0.5f, 0.5f, 0.5f}});
+  gCoordinator->addComponent(pointLight, ecs::comp::PointLight{0.2f});
+  gCoordinator->addComponent(pointLight, ecs::comp::Color{{1.0f, 1.0f, 1.0f}});
 }

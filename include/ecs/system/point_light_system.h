@@ -21,7 +21,9 @@ public:
   PointLight(const PointLight&) = delete;
   PointLight& operator=(const PointLight&) = delete;
 
-  void update(ven::FrameInfo& frameInfo);
+  void update(ven::GlobalUBO& ubo);
+
+  void draw(ven::FrameInfo& frameInfo);
 
 private:
   void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

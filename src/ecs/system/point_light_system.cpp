@@ -1,4 +1,8 @@
 #include "point_light_system.h"
+#include "colors.h"
+#include "point_light.h"
+#include "transform.h"
+#include "ven_frame_info.h"
 
 ecs::sys::PointLight::PointLight(ven::Device& device, VkRenderPass renderPass,
                                  VkDescriptorSetLayout globalSetLayout)
@@ -12,11 +16,11 @@ ecs::sys::PointLight::~PointLight() {
 
 void ecs::sys::PointLight::createPipelineLayout(
     VkDescriptorSetLayout globalSetLayout) {
-  // VkPushConstantRange pushConstRange{};
-  // pushConstRange.stageFlags =
-  //     VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-  // pushConstRange.offset = 0;
-  // pushConstRange.size = sizeof(ven::TempPushConstantData);
+  VkPushConstantRange pushConstRange{};
+  pushConstRange.stageFlags =
+      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+  pushConstRange.offset = 0;
+  pushConstRange.size = sizeof(ven::PointLightPushConstants);
 
   std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
 
@@ -25,8 +29,8 @@ void ecs::sys::PointLight::createPipelineLayout(
   pipelineLayoutInfo.setLayoutCount =
       static_cast<uint32_t>(descriptorSetLayouts.size());
   pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-  pipelineLayoutInfo.pushConstantRangeCount = 0;
-  pipelineLayoutInfo.pPushConstantRanges = nullptr;
+  pipelineLayoutInfo.pushConstantRangeCount = 1;
+  pipelineLayoutInfo.pPushConstantRanges = &pushConstRange;
 
   if (vkCreatePipelineLayout(venDevice.device(), &pipelineLayoutInfo, nullptr,
                              &pipelineLayout) != VK_SUCCESS)
@@ -47,12 +51,43 @@ void ecs::sys::PointLight::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
-void ecs::sys::PointLight::update(ven::FrameInfo& frameInfo) {
+void ecs::sys::PointLight::update(ven::GlobalUBO& ubo) {
+  int lightIndex = 0;
+  for (const auto& ent : m_entities) {
+    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
+    auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
+    auto& pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
+    ubo.pointLights[lightIndex].position =
+        glm::vec4(transform3d.translation, 1.0f);
+    ubo.pointLights[lightIndex].color =
+        glm::vec4(color.color, pointLight.lightIntensity);
+
+    ++lightIndex;
+  }
+  ubo.numLights = lightIndex;
+}
+
+void ecs::sys::PointLight::draw(ven::FrameInfo& frameInfo) {
   venPipeline->bind(frameInfo.cmdBuffer);
 
   vkCmdBindDescriptorSets(frameInfo.cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                           pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet,
                           0, nullptr);
 
-  vkCmdDraw(frameInfo.cmdBuffer, 6, 1, 0, 0);
+  for (const auto& ent : m_entities) {
+    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
+    auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
+    auto& pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
+    ven::PointLightPushConstants push{};
+    push.position = glm::vec4(transform3d.translation, 1.0f);
+    push.color = glm::vec4(color.color, pointLight.lightIntensity);
+    push.radius = transform3d.scale.x;
+
+    vkCmdPushConstants(frameInfo.cmdBuffer, pipelineLayout,
+                       VK_SHADER_STAGE_VERTEX_BIT |
+                           VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0, sizeof(ven::PointLightPushConstants), &push);
+
+    vkCmdDraw(frameInfo.cmdBuffer, 6, 1, 0, 0);
+  }
 }
