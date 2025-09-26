@@ -46,6 +46,7 @@ set(ECS_COMPONENT_SOURCES
 
 set(ECS_SYSTEM_SOURCES
     "${PROJECT_ROOT_DIR}/src/ecs/system/render_system.cpp"
+    "${PROJECT_ROOT_DIR}/src/ecs/system/point_light_system.cpp"
     "${PROJECT_ROOT_DIR}/src/ecs/system/keyboard_movement_controller_system.cpp"
 )
 
@@ -86,6 +87,8 @@ set(SHADER_DIR
 set(SHADER_FILES
     ${SHADER_DIR}/shader.vert
     ${SHADER_DIR}/shader.frag
+    ${SHADER_DIR}/point_light.vert
+    ${SHADER_DIR}/point_light.frag
 )
 
 foreach(SHADER_FILE ${SHADER_FILES})

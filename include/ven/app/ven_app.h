@@ -3,6 +3,7 @@
 #include "coordinator.h"
 #include "keyboard_movement_controller_system.h"
 #include "pch.h"
+#include "point_light_system.h"
 #include "render_system.h"
 #include "ven_buffer.h"
 #include "ven_descriptors.h"
@@ -14,7 +15,8 @@ extern std::unique_ptr<ecs::Coordinator> gCoordinator;
 
 namespace ven {
 struct GlobalUBO {
-  glm::mat4 projectionView{1.0f};
+  glm::mat4 projection{1.0f};
+  glm::mat4 view{1.0f};
   glm::vec4 ambientLightColor{1.0f, 1.0f, 1.0f, 0.02f}; // w is intensity
   glm::vec3 lightPosition{-1.0f};
   alignas(16) glm::vec4 lightColor{1.0f}; // w is light intensity
@@ -43,6 +45,7 @@ private:
   ven::Device venDevice{venWindow};
   ven::Renderer venRenderer{venWindow, venDevice};
   std::shared_ptr<ecs::sys::Render> renderSystem;
+  std::shared_ptr<ecs::sys::PointLight> pointLightSystem;
   std::shared_ptr<ecs::sys::KeyboardMovementControllerSystem>
       keyboardMovementSystem;
   std::unique_ptr<ven::DescriptorPool> globalPool{};

@@ -68,6 +68,10 @@ void ven::App::init() {
   renderSig.set(gCoordinator->getComponentType<ecs::comp::Model>());
   gCoordinator->setSystemSignature<ecs::sys::Render>(renderSig);
 
+  pointLightSystem = gCoordinator->registerSystem<ecs::sys::PointLight>(
+      venDevice, venRenderer.getSwapChainRenderPass(),
+      globalSetLayout->getDescriptorSetLayout());
+
   keyboardMovementSystem =
       gCoordinator
           ->registerSystem<ecs::sys::KeyboardMovementControllerSystem>();
@@ -140,12 +144,14 @@ void ven::App::run() {
       ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera,
                                globalDescriptorSets[frameIndex]};
       ven::GlobalUBO UBO{};
-      UBO.projectionView = camera.getProjection() * camera.getView();
+      UBO.projection = camera.getProjection();
+      UBO.view = camera.getView();
       UBOBuffers[frameIndex]->writeToBuffer(&UBO);
       UBOBuffers[frameIndex]->flush();
 
       venRenderer.beginSwapChainRenderPass(cmdBuffer);
       renderSystem->update(frameInfo);
+      pointLightSystem->update(frameInfo);
       venRenderer.endSwapChainRenderPass(cmdBuffer);
       venRenderer.endFrame();
     }

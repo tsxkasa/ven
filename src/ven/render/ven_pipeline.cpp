@@ -63,8 +63,8 @@ void ven::Pipeline::createPipeline(const std::string& vertPath,
   shaderStages[1].pNext = nullptr;
   shaderStages[1].pSpecializationInfo = nullptr;
 
-  auto bindingDescriptions = ven::Model::Vertex::getBindingDescriptions();
-  auto attributeDescriptions = ven::Model::Vertex::getAttributeDescriptions();
+  auto& bindingDescriptions = config.bindingDescription;
+  auto& attributeDescriptions = config.attributeDescription;
 
   VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
   vertexInputInfo.sType =
@@ -200,4 +200,8 @@ void ven::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
   configInfo.dynamicStateInfo.dynamicStateCount =
       static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
   configInfo.dynamicStateInfo.flags = 0;
+
+  configInfo.bindingDescription = ven::Model::Vertex::getBindingDescriptions();
+  configInfo.attributeDescription =
+      ven::Model::Vertex::getAttributeDescriptions();
 }
