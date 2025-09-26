@@ -50,7 +50,7 @@ ven::App::App() {
 void ven::App::init() {
   globalSetLayout = ven::DescriptorSetLayout::Builder(venDevice)
                         .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                    VK_SHADER_STAGE_VERTEX_BIT)
+                                    VK_SHADER_STAGE_ALL_GRAPHICS)
                         .build();
 
   gCoordinator->init();
@@ -133,7 +133,7 @@ void ven::App::run() {
     camera.setViewYXZ(camTransform.translation, camTransform.rotation);
 
     float aspect = venRenderer.getAspectRatio();
-    camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+    camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 1000.0f);
 
     if (auto cmdBuffer = venRenderer.beginFrame()) {
       int frameIndex = venRenderer.getFrameIndex();
