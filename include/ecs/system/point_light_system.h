@@ -21,7 +21,7 @@ public:
   PointLight(const PointLight&) = delete;
   PointLight& operator=(const PointLight&) = delete;
 
-  void update(ven::GlobalUBO& ubo);
+  void update(ven::FrameInfo& frameInfo, ven::GlobalUBO& ubo);
 
   void draw(ven::FrameInfo& frameInfo);
 

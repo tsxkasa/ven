@@ -51,12 +51,21 @@ void ecs::sys::PointLight::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
-void ecs::sys::PointLight::update(ven::GlobalUBO& ubo) {
+void ecs::sys::PointLight::update(ven::FrameInfo& frameInfo,
+                                  ven::GlobalUBO& ubo) {
+  auto rotateLight =
+      glm::rotate(glm::mat4(1.0f), frameInfo.dt, {0.0f, -1.0f, 0.0f});
   int lightIndex = 0;
   for (const auto& ent : m_entities) {
     auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
     auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
     auto& pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
+
+    assert(lightIndex < MAX_LIGHTS && "Point lights exceeded limits");
+
+    transform3d.translation =
+        glm::vec3(rotateLight * glm::vec4(transform3d.translation, 1.0f));
+
     ubo.pointLights[lightIndex].position =
         glm::vec4(transform3d.translation, 1.0f);
     ubo.pointLights[lightIndex].color =

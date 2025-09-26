@@ -153,7 +153,7 @@ void ven::App::run() {
       ven::GlobalUBO ubo{};
       ubo.projection = camera.getProjection();
       ubo.view = camera.getView();
-      pointLightSystem->update(ubo);
+      pointLightSystem->update(frameInfo, ubo);
       uboBuffers[frameIndex]->writeToBuffer(&ubo);
       uboBuffers[frameIndex]->flush();
 
@@ -178,10 +178,21 @@ void ven::App::loadObjects() {
   transform3d.scale = {0.5f, 0.5f, 0.5f};
   gCoordinator->addComponent(object, transform3d);
 
-  auto pointLight = gCoordinator->createEntity();
-  gCoordinator->addComponent(
-      pointLight,
-      ecs::comp::Transform3D{{0.0f, 0.0f, 0.0f}, {0.5f, 0.5f, 0.5f}});
-  gCoordinator->addComponent(pointLight, ecs::comp::PointLight{0.2f});
-  gCoordinator->addComponent(pointLight, ecs::comp::Color{{1.0f, 1.0f, 1.0f}});
+  std::vector<glm::vec3> lightColors{{1.f, .1f, .1f}, {.1f, .1f, 1.f},
+                                     {.1f, 1.f, .1f}, {1.f, 1.f, .1f},
+                                     {.1f, 1.f, 1.f}, {1.f, 1.f, 1.f}};
+
+  for (size_t i = 0; i < lightColors.size(); i++) {
+    auto pointLight = gCoordinator->createEntity();
+    gCoordinator->addComponent(pointLight, ecs::comp::Color{lightColors[i]});
+    auto rotateLight = glm::rotate(
+        glm::mat4(1.0f), (i * glm::two_pi<float>() / lightColors.size()),
+        {0.0f, -1.0f, 0.0f});
+    auto pointLightTransform3d = ecs::comp::Transform3D{};
+    pointLightTransform3d.translation =
+        glm::vec3(rotateLight * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
+    pointLightTransform3d.scale = {0.5f, 0.5f, 0.5f};
+    gCoordinator->addComponent(pointLight, pointLightTransform3d);
+    gCoordinator->addComponent(pointLight, ecs::comp::PointLight{0.2f});
+  }
 }
