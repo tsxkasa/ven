@@ -20,14 +20,12 @@ void ecs::sys::KeyboardMovementControllerSystem::moveInPlaneXZ(
       transform3d.rotation += lookSpeed * dt * glm::normalize(rotate);
     }
 
-    // FIX #1: Use a valid range for the clamp to allow vertical rotation.
     transform3d.rotation.x = glm::clamp(transform3d.rotation.x, -1.5f, 1.5f);
     transform3d.rotation.y =
         glm::mod(transform3d.rotation.y, glm::two_pi<float>());
 
     float yaw = transform3d.rotation.y;
     const glm::vec3 forwardDir{sin(yaw), 0.0f, cos(yaw)};
-    // FIX #2: Correctly calculate the right-direction vector.
     const glm::vec3 rightDir{forwardDir.z, 0.0f, -forwardDir.x};
     const glm::vec3 upDir{0.0f, -1.0f, 0.0f};
 
