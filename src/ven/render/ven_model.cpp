@@ -7,7 +7,7 @@
 namespace std {
 template <>
 struct hash<ven::Model::Vertex> {
-  size_t operator()(ven::Model::Vertex const& vertex) const {
+  auto operator()(ven::Model::Vertex const& vertex) const -> size_t {
     size_t seed = 0;
     ven::hashCombine(seed, vertex.position, vertex.color, vertex.normal,
                      vertex.uv);

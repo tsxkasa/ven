@@ -34,43 +34,41 @@ public:
 
   // Not copyable or movable
   Device(const Device&) = delete;
-  Device operator=(const Device&) = delete;
+  auto operator=(const Device&) -> Device = delete;
   Device(Device&&) = delete;
-  Device& operator=(Device&&) = delete;
+  auto operator=(Device&&) -> Device& = delete;
 
-  VkCommandPool getCommandPool() {
+  auto getCommandPool() -> VkCommandPool {
     return commandPool;
   }
-  VkDevice device() {
+  auto device() -> VkDevice {
     return device_;
   }
-  VkSurfaceKHR surface() {
+  auto surface() -> VkSurfaceKHR {
     return surface_;
   }
-  VkQueue graphicsQueue() {
+  auto graphicsQueue() -> VkQueue {
     return graphicsQueue_;
   }
-  VkQueue presentQueue() {
+  auto presentQueue() -> VkQueue {
     return presentQueue_;
   }
 
   SwapChainSupportDetails getSwapChainSupport() {
     return querySwapChainSupport(physicalDevice);
   }
-  uint32_t findMemoryType(uint32_t typeFilter,
-                          VkMemoryPropertyFlags properties);
-  QueueFamilyIndices findPhysicalQueueFamilies() {
+  auto findPhysicalQueueFamilies() -> QueueFamilyIndices {
     return findQueueFamilies(physicalDevice);
   }
-  VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
-                               VkImageTiling tiling,
-                               VkFormatFeatureFlags features);
+  auto findSupportedFormat(const std::vector<VkFormat>& candidates,
+                           VkImageTiling tiling, VkFormatFeatureFlags features)
+      -> VkFormat;
 
   // Buffer Helper Functions
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer& buffer,
-                    VkDeviceMemory& bufferMemory);
-  VkCommandBuffer beginSingleTimeCommands();
+                    VmaAllocation& allocation);
+  auto beginSingleTimeCommands() -> VkCommandBuffer;
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
   void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
@@ -78,7 +76,11 @@ public:
 
   void createImageWithInfo(const VkImageCreateInfo& imageInfo,
                            VkMemoryPropertyFlags properties, VkImage& image,
-                           VkDeviceMemory& imageMemory);
+                           VmaAllocation& allocation);
+
+  auto allocator() -> VmaAllocator& {
+    return allocator_;
+  }
 
   VkPhysicalDeviceProperties properties;
 
@@ -91,15 +93,16 @@ private:
   void createCommandPool();
 
   // helper functions
-  bool isDeviceSuitable(VkPhysicalDevice device);
-  std::vector<const char*> getRequiredExtensions();
-  bool checkValidationLayerSupport();
-  QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+  auto isDeviceSuitable(VkPhysicalDevice device) -> bool;
+  auto getRequiredExtensions() -> std::vector<const char*>;
+  auto checkValidationLayerSupport() -> bool;
+  auto findQueueFamilies(VkPhysicalDevice device) -> QueueFamilyIndices;
   void populateDebugMessengerCreateInfo(
       VkDebugUtilsMessengerCreateInfoEXT& createInfo);
   void hasGflwRequiredInstanceExtensions();
-  bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-  SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+  auto checkDeviceExtensionSupport(VkPhysicalDevice device) -> bool;
+  auto querySwapChainSupport(VkPhysicalDevice device)
+      -> SwapChainSupportDetails;
 
   VkInstance instance;
   VkDebugUtilsMessengerEXT debugMessenger;
@@ -116,6 +119,8 @@ private:
       "VK_LAYER_KHRONOS_validation"};
   const std::vector<const char*> deviceExtensions = {
       VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+  VmaAllocator allocator_{};
 };
 
 } // namespace ven

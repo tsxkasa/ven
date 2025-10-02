@@ -1,5 +1,6 @@
 #include "ven_swap_chain.h"
 #include <memory>
+#include <utility>
 
 ven::SwapChain::SwapChain(ven::Device& deviceRef, VkExtent2D extent)
     : device{deviceRef}
@@ -11,7 +12,7 @@ ven::SwapChain::SwapChain(ven::Device& deviceRef, VkExtent2D extent,
                           std::shared_ptr<ven::SwapChain> previous)
     : device{deviceRef}
     , windowExtent{extent}
-    , oldSwapChain(previous) {
+    , oldSwapChain(std::move(previous)) {
   init();
 
   // so it can be released from memory
@@ -40,8 +41,7 @@ ven::SwapChain::~SwapChain() {
 
   for (uint32_t i = 0; i < depthImages.size(); i++) {
     vkDestroyImageView(device.device(), depthImageViews[i], nullptr);
-    vkDestroyImage(device.device(), depthImages[i], nullptr);
-    vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
+    vmaDestroyImage(device.allocator(), depthImages[i], depthImageMemorys[i]);
   }
 
   for (auto framebuffer : swapChainFramebuffers) {
@@ -58,7 +58,7 @@ ven::SwapChain::~SwapChain() {
   }
 }
 
-VkResult ven::SwapChain::acquireNextImage(uint32_t* imageIndex) {
+auto ven::SwapChain::acquireNextImage(uint32_t* imageIndex) -> VkResult {
   vkWaitForFences(device.device(), 1, &inFlightFences[currentFrame], VK_TRUE,
                   std::numeric_limits<uint64_t>::max());
 
@@ -71,8 +71,8 @@ VkResult ven::SwapChain::acquireNextImage(uint32_t* imageIndex) {
   return result;
 }
 
-VkResult ven::SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers,
-                                              uint32_t* imageIndex) {
+auto ven::SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers,
+                                          uint32_t* imageIndex) -> VkResult {
   if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
     vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE,
                     UINT64_MAX);
@@ -370,8 +370,9 @@ void ven::SwapChain::createSyncObjects() {
   }
 }
 
-VkSurfaceFormatKHR ven::SwapChain::chooseSwapSurfaceFormat(
-    const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+auto ven::SwapChain::chooseSwapSurfaceFormat(
+    const std::vector<VkSurfaceFormatKHR>& availableFormats)
+    -> VkSurfaceFormatKHR {
   for (const auto& availableFormat : availableFormats) {
     if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
         availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -382,28 +383,29 @@ VkSurfaceFormatKHR ven::SwapChain::chooseSwapSurfaceFormat(
   return availableFormats[0];
 }
 
-VkPresentModeKHR ven::SwapChain::chooseSwapPresentMode(
-    const std::vector<VkPresentModeKHR>& availablePresentModes) {
+auto ven::SwapChain::chooseSwapPresentMode(
+    const std::vector<VkPresentModeKHR>& availablePresentModes)
+    -> VkPresentModeKHR {
   for (const auto& availablePresentMode : availablePresentModes) {
     if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-      std::cout << "Present mode: Mailbox" << std::endl;
+      std::cout << "Present mode: Mailbox" << '\n';
       return availablePresentMode;
     }
   }
 
   for (const auto& availablePresentMode : availablePresentModes) {
     if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-      std::cout << "Present mode: Immediate" << std::endl;
+      std::cout << "Present mode: Immediate" << '\n';
       return availablePresentMode;
     }
   }
 
-  std::cout << "Present mode: V-Sync" << std::endl;
+  std::cout << "Present mode: V-Sync" << '\n';
   return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D
-ven::SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+auto ven::SwapChain::chooseSwapExtent(
+    const VkSurfaceCapabilitiesKHR& capabilities) -> VkExtent2D {
   if (capabilities.currentExtent.width !=
       std::numeric_limits<uint32_t>::max()) {
     return capabilities.currentExtent;
@@ -420,7 +422,7 @@ ven::SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
   }
 }
 
-VkFormat ven::SwapChain::findDepthFormat() {
+auto ven::SwapChain::findDepthFormat() -> VkFormat {
   return device.findSupportedFormat(
       {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT,
        VK_FORMAT_D24_UNORM_S8_UINT},

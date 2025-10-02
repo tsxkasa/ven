@@ -25,7 +25,7 @@ std::vector<char> ven::Pipeline::readShaders(const std::string& path) {
   std::vector<char> buffer(fSize);
 
   file.seekg(0);
-  file.read(buffer.data(), fSize);
+  file.read(buffer.data(), static_cast<int>(fSize));
 
   file.close();
 

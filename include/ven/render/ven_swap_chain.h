@@ -15,44 +15,45 @@ public:
   ~SwapChain();
 
   SwapChain(const SwapChain&) = delete;
-  SwapChain operator=(const SwapChain&) = delete;
+  auto operator=(const SwapChain&) -> SwapChain = delete;
 
-  VkFramebuffer getFrameBuffer(int index) {
+  auto getFrameBuffer(int index) -> VkFramebuffer {
     return swapChainFramebuffers[index];
   }
-  VkRenderPass getRenderPass() {
+  auto getRenderPass() -> VkRenderPass {
     return renderPass;
   }
-  VkImageView getImageView(int index) {
+  auto getImageView(int index) -> VkImageView {
     return swapChainImageViews[index];
   }
-  size_t imageCount() {
+  auto imageCount() -> size_t {
     return swapChainImages.size();
   }
-  VkFormat getSwapChainImageFormat() {
+  auto getSwapChainImageFormat() -> VkFormat {
     return swapChainImageFormat;
   }
-  VkExtent2D getSwapChainExtent() {
+  auto getSwapChainExtent() -> VkExtent2D {
     return swapChainExtent;
   }
-  uint32_t width() {
+  auto width() -> uint32_t {
     return swapChainExtent.width;
   }
-  uint32_t height() {
+  auto height() -> uint32_t {
     return swapChainExtent.height;
   }
 
-  float extentAspectRatio() {
+  auto extentAspectRatio() -> float {
     return static_cast<float>(swapChainExtent.width) /
            static_cast<float>(swapChainExtent.height);
   }
-  VkFormat findDepthFormat();
+  auto findDepthFormat() -> VkFormat;
 
-  VkResult acquireNextImage(uint32_t* imageIndex);
-  VkResult submitCommandBuffers(const VkCommandBuffer* buffers,
-                                uint32_t* imageIndex);
+  auto acquireNextImage(uint32_t* imageIndex) -> VkResult;
+  auto submitCommandBuffers(const VkCommandBuffer* buffers,
+                            uint32_t* imageIndex) -> VkResult;
 
-  inline bool compareSwapFormats(const ven::SwapChain& swapchain) const {
+  [[nodiscard]] inline auto
+  compareSwapFormats(const ven::SwapChain& swapchain) const -> bool {
     return swapchain.swapchainDepthFormat == swapchainDepthFormat &&
            swapchain.swapChainImageFormat == swapChainImageFormat;
   }
@@ -81,7 +82,7 @@ private:
   VkRenderPass renderPass;
 
   std::vector<VkImage> depthImages;
-  std::vector<VkDeviceMemory> depthImageMemorys;
+  std::vector<VmaAllocation> depthImageMemorys;
   std::vector<VkImageView> depthImageViews;
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;

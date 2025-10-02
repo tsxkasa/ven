@@ -42,7 +42,6 @@ private:
       keyboardMovementSystem;
   std::unique_ptr<ven::DescriptorPool> globalPool;
   std::unique_ptr<ven::DescriptorSetLayout> globalSetLayout;
-  VmaAllocator allocator;
 
   Entity viewerObj;
 };

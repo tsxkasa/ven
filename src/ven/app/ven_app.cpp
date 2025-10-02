@@ -102,12 +102,12 @@ ven::App::~App() {}
 void ven::App::run() {
   std::vector<std::unique_ptr<ven::Buffer>> uboBuffers(
       ven::SwapChain::MAX_FRAMES_IN_FLIGHT);
-  for (size_t i = 0; i < uboBuffers.size(); i++) {
-    uboBuffers[i] = std::make_unique<ven::Buffer>(
+  for (auto& uboBuffer : uboBuffers) {
+    uboBuffer = std::make_unique<ven::Buffer>(
         venDevice, sizeof(GlobalUBO), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    uboBuffers[i]->map();
+    uboBuffer->map();
   }
 
   std::vector<VkDescriptorSet> globalDescriptorSets(

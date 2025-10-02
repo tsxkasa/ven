@@ -23,12 +23,14 @@ public:
 
   DescriptorSetLayout(
       ven::Device& venDevice,
-      std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+      const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding>&
+          bindings);
   ~DescriptorSetLayout();
   DescriptorSetLayout(const ven::DescriptorSetLayout&) = delete;
-  DescriptorSetLayout& operator=(const ven::DescriptorSetLayout&) = delete;
+  auto operator=(const ven::DescriptorSetLayout&)
+      -> DescriptorSetLayout& = delete;
 
-  VkDescriptorSetLayout getDescriptorSetLayout() const {
+  [[nodiscard]] auto getDescriptorSetLayout() const -> VkDescriptorSetLayout {
     return descriptorSetLayout;
   }
 
@@ -47,10 +49,11 @@ public:
     Builder(ven::Device& venDevice)
         : venDevice{venDevice} {}
 
-    Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
-    Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
-    Builder& setMaxSets(uint32_t count);
-    std::unique_ptr<ven::DescriptorPool> build() const;
+    auto addPoolSize(VkDescriptorType descriptorType, uint32_t count)
+        -> Builder&;
+    auto setPoolFlags(VkDescriptorPoolCreateFlags flags) -> Builder&;
+    auto setMaxSets(uint32_t count) -> Builder&;
+    [[nodiscard]] auto build() const -> std::unique_ptr<ven::DescriptorPool>;
 
   private:
     ven::Device& venDevice;
@@ -64,10 +67,10 @@ public:
                  const std::vector<VkDescriptorPoolSize>& poolSizes);
   ~DescriptorPool();
   DescriptorPool(const DescriptorPool&) = delete;
-  DescriptorPool& operator=(const DescriptorPool&) = delete;
+  auto operator=(const DescriptorPool&) -> DescriptorPool& = delete;
 
-  bool allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout,
-                          VkDescriptorSet& descriptor) const;
+  auto allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout,
+                          VkDescriptorSet& descriptor) const -> bool;
 
   void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
 

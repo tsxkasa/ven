@@ -1,7 +1,9 @@
 #include "ven_buffer.h"
+#include "pch.h"
 
-VkDeviceSize ven::Buffer::getAlignment(VkDeviceSize instanceSize,
-                                       VkDeviceSize minOffsetAlignment) {
+auto ven::Buffer::getAlignment(VkDeviceSize instanceSize,
+                               VkDeviceSize minOffsetAlignment)
+    -> VkDeviceSize {
   if (minOffsetAlignment > 0) {
     return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
   }
@@ -20,28 +22,31 @@ ven::Buffer::Buffer(ven::Device& device, VkDeviceSize instanceSize,
   alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
   bufferSize = alignmentSize * instanceCount;
   device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer,
-                      memory);
+                      allocation);
 }
 
 ven::Buffer::~Buffer() {
   unmap();
-  vkDestroyBuffer(venDevice.device(), buffer, nullptr);
-  vkFreeMemory(venDevice.device(), memory, nullptr);
+  vmaDestroyBuffer(venDevice.allocator(), buffer, allocation);
 }
 
 /**
- * Map a memory range of this buffer. If successful, mapped points to the
- * specified buffer range.
+ * Map the entire buffer memory using VMA. If successful, 'mapped' points
+ * to the allocation and can be used directly with memcpy.
  *
- * @param size (Optional) Size of the memory range to map. Pass VK_WHOLE_SIZE to
- * map the complete buffer range.
- * @param offset (Optional) Byte offset from beginning
- *
- * @return VkResult of the buffer mapping call
+ * @return VkResult of the mapping call
  */
-VkResult ven::Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
-  assert(buffer && memory && "Called map on buffer before create");
-  return vkMapMemory(venDevice.device(), memory, offset, size, 0, &mapped);
+auto ven::Buffer::map() -> VkResult {
+  assert(buffer && allocation && "Called map on buffer before create");
+
+  void* ptr = nullptr;
+  VkResult result = vmaMapMemory(venDevice.allocator(), allocation, &ptr);
+
+  if (result == VK_SUCCESS) {
+    mapped = static_cast<char*>(ptr); // Points to start of allocation
+  }
+
+  return result;
 }
 
 /**
@@ -51,9 +56,22 @@ VkResult ven::Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
  */
 void ven::Buffer::unmap() {
   if (mapped) {
-    vkUnmapMemory(venDevice.device(), memory);
+    vmaUnmapMemory(venDevice.allocator(), allocation);
     mapped = nullptr;
   }
+}
+
+/**
+ * Helper to copy data directly into the buffer
+ *
+ * @param data Pointer to source data
+ * @param size Number of bytes to copy
+ * @param offset Optional byte offset within the buffer (default 0)
+ */
+void ven::Buffer::write(const void* data, VkDeviceSize size,
+                        VkDeviceSize offset) {
+  assert(mapped && "Buffer must be mapped before writing");
+  memcpy(static_cast<char*>(mapped) + offset, data, size);
 }
 
 /**
@@ -90,15 +108,11 @@ void ven::Buffer::writeToBuffer(void* data, VkDeviceSize size,
  *
  * @return VkResult of the flush call
  */
-VkResult ven::Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-  VkMappedMemoryRange mappedRange = {};
-  mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-  mappedRange.memory = memory;
-  mappedRange.offset = offset;
-  mappedRange.size = size;
-  return vkFlushMappedMemoryRanges(venDevice.device(), 1, &mappedRange);
-}
+auto ven::Buffer::flush(VkDeviceSize size, VkDeviceSize offset) -> VkResult {
+  assert(allocation && "Called flush on buffer before allocation");
 
+  return vmaFlushAllocation(venDevice.allocator(), allocation, offset, size);
+}
 /**
  * Invalidate a memory range of the buffer to make it visible to the host
  *
@@ -110,13 +124,11 @@ VkResult ven::Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
  *
  * @return VkResult of the invalidate call
  */
-VkResult ven::Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-  VkMappedMemoryRange mappedRange = {};
-  mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-  mappedRange.memory = memory;
-  mappedRange.offset = offset;
-  mappedRange.size = size;
-  return vkInvalidateMappedMemoryRanges(venDevice.device(), 1, &mappedRange);
+auto ven::Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
+    -> VkResult {
+  assert(allocation && "Called invalidate on buffer before allocation");
+  return vmaInvalidateAllocation(venDevice.allocator(), allocation, offset,
+                                 size);
 }
 
 /**
@@ -127,8 +139,8 @@ VkResult ven::Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
  *
  * @return VkDescriptorBufferInfo of specified offset and range
  */
-VkDescriptorBufferInfo ven::Buffer::descriptorInfo(VkDeviceSize size,
-                                                   VkDeviceSize offset) {
+auto ven::Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset)
+    -> VkDescriptorBufferInfo {
   return VkDescriptorBufferInfo{
       buffer,
       offset,
@@ -155,7 +167,7 @@ void ven::Buffer::writeToIndex(void* data, int index) {
  * @param index Used in offset calculation
  *
  */
-VkResult ven::Buffer::flushIndex(int index) {
+auto ven::Buffer::flushIndex(int index) -> VkResult {
   return flush(alignmentSize, index * alignmentSize);
 }
 
@@ -166,7 +178,7 @@ VkResult ven::Buffer::flushIndex(int index) {
  *
  * @return VkDescriptorBufferInfo for instance at index
  */
-VkDescriptorBufferInfo ven::Buffer::descriptorInfoForIndex(int index) {
+auto ven::Buffer::descriptorInfoForIndex(int index) -> VkDescriptorBufferInfo {
   return descriptorInfo(alignmentSize, index * alignmentSize);
 }
 
@@ -179,6 +191,6 @@ VkDescriptorBufferInfo ven::Buffer::descriptorInfoForIndex(int index) {
  *
  * @return VkResult of the invalidate call
  */
-VkResult ven::Buffer::invalidateIndex(int index) {
+auto ven::Buffer::invalidateIndex(int index) -> VkResult {
   return invalidate(alignmentSize, index * alignmentSize);
 }

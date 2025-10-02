@@ -3,7 +3,6 @@
 #include "pch.h"
 #include "ven_device.h"
 
-
 namespace ven {
 
 class Buffer {
@@ -15,57 +14,59 @@ public:
   ~Buffer();
 
   Buffer(const ven::Buffer&) = delete;
-  Buffer& operator=(const ven::Buffer&) = delete;
+  auto operator=(const ven::Buffer&) -> Buffer& = delete;
 
-  VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+  auto map() -> VkResult;
   void unmap();
+  void write(const void* data, VkDeviceSize size, VkDeviceSize offset);
 
   void writeToBuffer(void* data, VkDeviceSize size = VK_WHOLE_SIZE,
                      VkDeviceSize offset = 0);
-  VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-  VkDescriptorBufferInfo descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE,
-                                        VkDeviceSize offset = 0);
-  VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE,
-                      VkDeviceSize offset = 0);
+  auto flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)
+      -> VkResult;
+  auto descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE,
+                      VkDeviceSize offset = 0) -> VkDescriptorBufferInfo;
+  auto invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)
+      -> VkResult;
 
   void writeToIndex(void* data, int index);
-  VkResult flushIndex(int index);
-  VkDescriptorBufferInfo descriptorInfoForIndex(int index);
-  VkResult invalidateIndex(int index);
+  auto flushIndex(int index) -> VkResult;
+  auto descriptorInfoForIndex(int index) -> VkDescriptorBufferInfo;
+  auto invalidateIndex(int index) -> VkResult;
 
-  VkBuffer getBuffer() const {
+  [[nodiscard]] auto getBuffer() const -> VkBuffer {
     return buffer;
   }
-  void* getMappedMemory() const {
+  [[nodiscard]] auto getMappedMemory() const -> void* {
     return mapped;
   }
-  uint32_t getInstanceCount() const {
+  [[nodiscard]] auto getInstanceCount() const -> uint32_t {
     return instanceCount;
   }
-  VkDeviceSize getInstanceSize() const {
+  [[nodiscard]] auto getInstanceSize() const -> VkDeviceSize {
     return instanceSize;
   }
-  VkDeviceSize getAlignmentSize() const {
+  [[nodiscard]] auto getAlignmentSize() const -> VkDeviceSize {
     return instanceSize;
   }
-  VkBufferUsageFlags getUsageFlags() const {
+  [[nodiscard]] auto getUsageFlags() const -> VkBufferUsageFlags {
     return usageFlags;
   }
-  VkMemoryPropertyFlags getMemoryPropertyFlags() const {
+  [[nodiscard]] auto getMemoryPropertyFlags() const -> VkMemoryPropertyFlags {
     return memoryPropertyFlags;
   }
-  VkDeviceSize getBufferSize() const {
+  [[nodiscard]] auto getBufferSize() const -> VkDeviceSize {
     return bufferSize;
   }
 
 private:
-  static VkDeviceSize getAlignment(VkDeviceSize instanceSize,
-                                   VkDeviceSize minOffsetAlignment);
+  static auto getAlignment(VkDeviceSize instanceSize,
+                           VkDeviceSize minOffsetAlignment) -> VkDeviceSize;
 
   ven::Device& venDevice;
   void* mapped = nullptr;
   VkBuffer buffer = VK_NULL_HANDLE;
-  VkDeviceMemory memory = VK_NULL_HANDLE;
+  VmaAllocation allocation;
 
   VkDeviceSize bufferSize;
   uint32_t instanceCount;

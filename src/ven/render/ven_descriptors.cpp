@@ -26,10 +26,11 @@ ven::DescriptorSetLayout::Builder::build() const {
 
 ven::DescriptorSetLayout::DescriptorSetLayout(
     ven::Device& venDevice,
-    std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+    const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding>& bindings)
     : venDevice{venDevice}
     , bindings{bindings} {
   std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
+  setLayoutBindings.reserve(bindings.size());
   for (auto kv : bindings) {
     setLayoutBindings.push_back(kv.second);
   }

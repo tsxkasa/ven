@@ -27,7 +27,7 @@ void ven::Renderer::createCmdBuffers() {
 
 void ven::Renderer::freeCmdBuffers() {
   vkFreeCommandBuffers(venDevice.device(), venDevice.getCommandPool(),
-                       static_cast<float>(cmdBuffers.size()),
+                       static_cast<uint32_t>(cmdBuffers.size()),
                        cmdBuffers.data());
   cmdBuffers.clear();
 }
@@ -110,7 +110,8 @@ void ven::Renderer::beginSwapChainRenderPass(VkCommandBuffer cmdBuffer) {
   VkRenderPassBeginInfo renderPassInfo{};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
   renderPassInfo.renderPass = venSwapChain->getRenderPass();
-  renderPassInfo.framebuffer = venSwapChain->getFrameBuffer(currentImageIndex);
+  renderPassInfo.framebuffer =
+      venSwapChain->getFrameBuffer(static_cast<int>(currentImageIndex));
 
   renderPassInfo.renderArea.offset = {0, 0};
   renderPassInfo.renderArea.extent = venSwapChain->getSwapChainExtent();
