@@ -5,7 +5,7 @@
 #include "point_light.h"
 #include "transform.h"
 
-glm::vec3 rgb(float h, float s, float v) {
+auto rgb(float h, float s, float v) -> glm::vec3 {
   float c = v * s; // Chroma
   float x = c * (1.0f - glm::abs(glm::mod(h / 60.0f, 2.0f) - 1.0f));
   float m = v - c;
@@ -186,9 +186,11 @@ void ven::App::loadObjects() {
   for (size_t i = 0; i < lightColors.size(); i++) {
     auto pointLight = gCoordinator->createEntity();
     gCoordinator->addComponent(pointLight, ecs::comp::Color{lightColors[i]});
-    auto rotateLight = glm::rotate(
-        glm::mat4(1.0f), (i * glm::two_pi<float>() / lightColors.size()),
-        {0.0f, -1.0f, 0.0f});
+    auto rotateLight =
+        glm::rotate(glm::mat4(1.0f),
+                    (static_cast<float>(i) * glm::two_pi<float>() /
+                     static_cast<float>(lightColors.size())),
+                    {0.0f, -1.0f, 0.0f});
     auto pointLightTransform3d = ecs::comp::Transform3D{};
     pointLightTransform3d.translation =
         glm::vec3(rotateLight * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));

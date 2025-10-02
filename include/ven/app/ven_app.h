@@ -20,11 +20,11 @@ public:
   ~App();
 
   App(const App&) = delete;
-  App& operator=(const App&) = delete;
+  auto operator=(const App&) -> App& = delete;
 
   void run();
 
-  inline const ven::Window& getAppWindow() const {
+  [[nodiscard]] auto getAppWindow() const -> const ven::Window& {
     return venWindow;
   }
 
@@ -40,8 +40,9 @@ private:
   std::shared_ptr<ecs::sys::PointLight> pointLightSystem;
   std::shared_ptr<ecs::sys::KeyboardMovementControllerSystem>
       keyboardMovementSystem;
-  std::unique_ptr<ven::DescriptorPool> globalPool{};
+  std::unique_ptr<ven::DescriptorPool> globalPool;
   std::unique_ptr<ven::DescriptorSetLayout> globalSetLayout;
+  VmaAllocator allocator;
 
   Entity viewerObj;
 };

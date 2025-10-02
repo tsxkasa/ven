@@ -50,7 +50,7 @@ void main() {
     float blinnTerm = dot(surfaceNormal, halfAngle);
     blinnTerm = clamp(blinnTerm, 0, 1);
     blinnTerm = pow(blinnTerm, 512.0); // higher values -> sharper highlight
-    specularLight += intensity * blinnTerm;
+    specularLight += intensity * blinnTerm; // specularLight += light.color.xyz * attenuation * blinnTerm; // for shinier thighs
   }
 
   outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);

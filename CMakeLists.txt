@@ -122,8 +122,9 @@ find_package(Vulkan REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(Stb REQUIRED)
-find_package(imgui CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 
 target_link_libraries(ven
     PRIVATE
@@ -132,8 +133,11 @@ target_link_libraries(ven
         fmt::fmt
         glfw
         spdlog::spdlog
-        imgui::imgui
         tinyobjloader::tinyobjloader
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        GPUOpen::VulkanMemoryAllocator
 )
 
 

@@ -1,4 +1,5 @@
 #include "ven_camera.h"
+#include <vulkan/vulkan_core.h>
 
 void ven::Camera::setOrthographicProjection(float left, float right, float top,
                                             float bottom, float near,

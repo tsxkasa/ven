@@ -8,14 +8,13 @@
     "stb",
     "glm",
     "vulkan",
+    "tinyobjloader",
     {
-      "name": "imgui",
-      "features": [
-        "glfw-binding",
-        "vulkan-binding"
-      ]
+      "name": "qtbase",
+      "features": ["gui", "widgets", "vulkan"],
+      "default-features": false
     },
-    "tinyobjloader"
+    "vulkan-memory-allocator"
   ],
   "builtin-baseline": "b1e15efef6758eaa0beb0a8732cfa66f6a68a81d"
 }
