@@ -1,8 +1,13 @@
 {
-  "name": "graviballs",
+  "name": "ven",
   "version-string": "0.1.0",
   "dependencies": [
-    "glfw3",
+    {
+      "name": "glfw3",
+      "features": [
+        "wayland"
+      ]
+    },
     "fmt",
     "spdlog",
     "stb",
@@ -11,7 +16,11 @@
     "tinyobjloader",
     {
       "name": "qtbase",
-      "features": ["gui", "widgets", "vulkan"],
+      "features": [
+        "gui",
+        "widgets",
+        "vulkan"
+      ],
       "default-features": false
     },
     "vulkan-memory-allocator"
