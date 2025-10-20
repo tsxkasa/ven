@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "ven_app.h"
 #include "ven_ui.h"
+#include <GLFW/glfw3.h>
+#include <print>
 
 std::unique_ptr<ecs::Coordinator> gCoordinator;
 
-int main() {
+auto main() -> int {
   gCoordinator = std::make_unique<ecs::Coordinator>();
   ven::App app{};
   try {

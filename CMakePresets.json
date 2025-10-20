@@ -37,7 +37,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
+        "CUSTOM_COMPILE_FLAGS": "-g;-O0;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {
@@ -81,7 +81,7 @@
       "binaryDir": "${sourceDir}/build/Linux-GCC-Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CUSTOM_COMPILE_FLAGS": "-g;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
+        "CUSTOM_COMPILE_FLAGS": "-g;-O0;-DDEBUG;-Wall;-Wextra;-fno-omit-frame-pointer",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
       "environment": {}

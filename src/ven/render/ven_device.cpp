@@ -1,16 +1,13 @@
 #include "ven_device.h"
-#include <vulkan/vulkan_core.h>
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
 
 namespace ven {
 
 // local callback functions
-static VKAPI_ATTR VkBool32 VKAPI_CALL
+static VKAPI_ATTR auto VKAPI_CALL
 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
               VkDebugUtilsMessageTypeFlagsEXT messageType,
               const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-              void* pUserData) {
+              void* pUserData) -> VkBool32 {
   std::cerr << "validation layer: " << pCallbackData->pMessage << '\n';
 
   return VK_FALSE;
@@ -82,7 +79,7 @@ void ven::Device::createInstance() {
 
   VkApplicationInfo appInfo = {};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pApplicationName = "LittleVulkanEngine App";
+  appInfo.pApplicationName = "ven App";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
   appInfo.pEngineName = "No Engine";
   appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -254,7 +251,7 @@ void ven::Device::setupDebugMessenger() {
   }
 }
 
-bool ven::Device::checkValidationLayerSupport() {
+auto ven::Device::checkValidationLayerSupport() -> bool {
   uint32_t layerCount;
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -279,7 +276,7 @@ bool ven::Device::checkValidationLayerSupport() {
   return true;
 }
 
-std::vector<const char*> ven::Device::getRequiredExtensions() {
+auto ven::Device::getRequiredExtensions() -> std::vector<const char*> {
   uint32_t glfwExtensionCount = 0;
   const char** glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -318,7 +315,7 @@ void ven::Device::hasGflwRequiredInstanceExtensions() {
   }
 }
 
-bool ven::Device::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+auto ven::Device::checkDeviceExtensionSupport(VkPhysicalDevice device) -> bool {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
                                        nullptr);
@@ -337,7 +334,8 @@ bool ven::Device::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-QueueFamilyIndices ven::Device::findQueueFamilies(VkPhysicalDevice device) {
+auto ven::Device::findQueueFamilies(VkPhysicalDevice device)
+    -> QueueFamilyIndices {
   QueueFamilyIndices indices;
 
   uint32_t queueFamilyCount = 0;
@@ -370,8 +368,8 @@ QueueFamilyIndices ven::Device::findQueueFamilies(VkPhysicalDevice device) {
   return indices;
 }
 
-SwapChainSupportDetails
-ven::Device::querySwapChainSupport(VkPhysicalDevice device) {
+auto ven::Device::querySwapChainSupport(VkPhysicalDevice device)
+    -> SwapChainSupportDetails {
   SwapChainSupportDetails details;
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_,
                                             &details.capabilities);
@@ -397,10 +395,10 @@ ven::Device::querySwapChainSupport(VkPhysicalDevice device) {
   return details;
 }
 
-VkFormat
-ven::Device::findSupportedFormat(const std::vector<VkFormat>& candidates,
-                                 VkImageTiling tiling,
-                                 VkFormatFeatureFlags features) {
+auto ven::Device::findSupportedFormat(const std::vector<VkFormat>& candidates,
+                                      VkImageTiling tiling,
+                                      VkFormatFeatureFlags features)
+    -> VkFormat {
   for (VkFormat format : candidates) {
     VkFormatProperties props;
     vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
@@ -519,8 +517,8 @@ void ven::Device::copyBufferToImage(VkBuffer buffer, VkImage image,
   region.imageSubresource.baseArrayLayer = 0;
   region.imageSubresource.layerCount = layerCount;
 
-  region.imageOffset = {0, 0, 0};
-  region.imageExtent = {width, height, 1};
+  region.imageOffset = {.x = 0, .y = 0, .z = 0};
+  region.imageExtent = {.width = width, .height = height, .depth = 1};
 
   vkCmdCopyBufferToImage(commandBuffer, buffer, image,
                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);

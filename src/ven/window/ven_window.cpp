@@ -1,10 +1,12 @@
 #include "ven_window.h"
 #include <GLFW/glfw3.h>
 
+#include <utility>
+
 ven::Window::Window(std::string name, int w, int h)
     : width(w)
     , height(h)
-    , windowTitle(name) {
+    , windowTitle(std::move(name)) {
   glfwInit();
   monitor = glfwGetPrimaryMonitor();
   vidMode = glfwGetVideoMode(monitor);

@@ -8,3 +8,4 @@ logs/
 .clang-format
 .clangd
 .clang-tidy
+.cache/

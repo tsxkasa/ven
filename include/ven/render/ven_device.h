@@ -54,7 +54,7 @@ public:
     return presentQueue_;
   }
 
-  SwapChainSupportDetails getSwapChainSupport() {
+  auto getSwapChainSupport() -> SwapChainSupportDetails {
     return querySwapChainSupport(physicalDevice);
   }
   auto findPhysicalQueueFamilies() -> QueueFamilyIndices {

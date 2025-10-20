@@ -37,7 +37,7 @@ auto rgb(float h, float s, float v) -> glm::vec3 {
     b = x;
   }
 
-  return glm::vec3(r + m, g + m, b + m);
+  return {r + m, g + m, b + m};
 }
 
 ven::App::App() {
@@ -97,7 +97,7 @@ void ven::App::init() {
   loadObjects();
 }
 
-ven::App::~App() {}
+ven::App::~App() = default;
 
 void ven::App::run() {
   std::vector<std::unique_ptr<ven::Buffer>> uboBuffers(
@@ -148,8 +148,12 @@ void ven::App::run() {
 
     if (auto cmdBuffer = venRenderer.beginFrame()) {
       int frameIndex = venRenderer.getFrameIndex();
-      ven::FrameInfo frameInfo{frameIndex, dt, cmdBuffer, camera,
-                               globalDescriptorSets[frameIndex]};
+      ven::FrameInfo frameInfo{.frameIndex = frameIndex,
+                               .dt = dt,
+                               .cmdBuffer = cmdBuffer,
+                               .camera = camera,
+                               .globalDescriptorSet =
+                                   globalDescriptorSets[frameIndex]};
       ven::GlobalUBO ubo{};
       ubo.projection = camera.getProjection();
       ubo.view = camera.getView();

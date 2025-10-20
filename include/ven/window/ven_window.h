@@ -11,17 +11,17 @@ public:
   Window(std::string name, int w, int h);
   ~Window();
 
-  inline int shouldClose() const {
+  [[nodiscard]] inline auto shouldClose() const -> int {
     return glfwWindowShouldClose(window);
   }
 
-  inline VkExtent2D getExtent() const {
+  [[nodiscard]] inline auto getExtent() const -> VkExtent2D {
     return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
   }
 
   void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
-  inline bool wasResized() {
+  inline auto wasResized() -> bool {
     return framebufferResized;
   }
 
@@ -29,13 +29,13 @@ public:
     framebufferResized = false;
   }
 
-  inline GLFWwindow* getWindow() const {
+  [[nodiscard]] inline auto getWindow() const -> GLFWwindow* {
     return window;
   }
-  inline GLFWmonitor* getMonitor() const {
+  [[nodiscard]] inline auto getMonitor() const -> GLFWmonitor* {
     return monitor;
   }
-  inline const GLFWvidmode* getVidMode() const {
+  [[nodiscard]] inline auto getVidMode() const -> const GLFWvidmode* {
     return vidMode;
   }
 
