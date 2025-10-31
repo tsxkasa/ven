@@ -12,9 +12,10 @@ public:
     Builder(ven::Device& venDevice)
         : venDevice{venDevice} {}
 
-    Builder& addBinding(uint32_t binding, VkDescriptorType descriptorType,
-                        VkShaderStageFlags stageFlags, uint32_t count = 1);
-    std::unique_ptr<ven::DescriptorSetLayout> build() const;
+    auto addBinding(uint32_t binding, VkDescriptorType descriptorType,
+                    VkShaderStageFlags stageFlags, uint32_t count = 1)
+        -> Builder&;
+    auto build() const -> std::unique_ptr<ven::DescriptorSetLayout>;
 
   private:
     ven::Device& venDevice;
@@ -88,12 +89,12 @@ public:
   DescriptorWriter(ven::DescriptorSetLayout& setLayout,
                    ven::DescriptorPool& pool);
 
-  DescriptorWriter& writeBuffer(uint32_t binding,
-                                VkDescriptorBufferInfo* bufferInfo);
-  DescriptorWriter& writeImage(uint32_t binding,
-                               VkDescriptorImageInfo* imageInfo);
+  auto writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo)
+      -> DescriptorWriter&;
+  auto writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo)
+      -> DescriptorWriter&;
 
-  bool build(VkDescriptorSet& set);
+  auto build(VkDescriptorSet& set) -> bool;
   void overwrite(VkDescriptorSet& set);
 
 private:
