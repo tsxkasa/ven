@@ -9,3 +9,4 @@ logs/
 .clangd
 .clang-tidy
 .cache/
+compile_commands.json

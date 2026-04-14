@@ -43,12 +43,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_ENABLE_EXPERIMENTAL
 #include <GLFW/glfw3.h>
-#include <QApplication>
-#include <QMainWindow>
-#include <QVulkanInstance>
-#include <QVulkanWindow>
-#include <QWidget>
-#include <QWindow>
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -56,7 +50,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/hash.hpp>
 #include <spdlog/common.h>
-#include <stb_image.h>
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.h>
 

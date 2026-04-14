@@ -2,28 +2,13 @@
   "name": "ven",
   "version-string": "0.1.0",
   "dependencies": [
-    {
-      "name": "glfw3",
-      "features": [
-        "wayland"
-      ]
-    },
     "fmt",
     "spdlog",
     "stb",
     "glm",
-    "vulkan",
     "tinyobjloader",
-    {
-      "name": "qtbase",
-      "features": [
-        "gui",
-        "widgets",
-        "vulkan"
-      ],
-      "default-features": false
-    },
-    "vulkan-memory-allocator"
+    "vulkan-memory-allocator",
+    { "name": "imgui", "features": ["glfw-binding", "vulkan-binding"] }
   ],
-  "builtin-baseline": "b1e15efef6758eaa0beb0a8732cfa66f6a68a81d"
+  "builtin-baseline": "81e3c888ef717a026eb57bb2f3cb0dbd30246271"
 }

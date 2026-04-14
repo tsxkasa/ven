@@ -4,7 +4,7 @@
 #include "transform.h"
 #include "ven_frame_info.h"
 
-ecs::sys::PointLight::PointLight(ven::Device& device, VkRenderPass renderPass,
+ecs::sys::PointLight::PointLight(ven::Device &device, VkRenderPass renderPass,
                                  VkDescriptorSetLayout globalSetLayout)
     : venDevice{device} {
   createPipelineLayout(globalSetLayout);
@@ -51,15 +51,15 @@ void ecs::sys::PointLight::createPipeline(VkRenderPass renderPass) {
       pipelineConfig);
 }
 
-void ecs::sys::PointLight::update(ven::FrameInfo& frameInfo,
-                                  ven::GlobalUBO& ubo) {
+void ecs::sys::PointLight::update(ven::FrameInfo &frameInfo,
+                                  ven::GlobalUBO &ubo) {
   auto rotateLight =
       glm::rotate(glm::mat4(1.0f), frameInfo.dt, {0.0f, -1.0f, 0.0f});
   int lightIndex = 0;
-  for (const auto& ent : m_entities) {
-    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
-    auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
-    auto& pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
+  for (const auto &ent : m_entities) {
+    auto &transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
+    auto &color = gCoordinator->getComponent<ecs::comp::Color>(ent);
+    auto &pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
 
     assert(lightIndex < MAX_LIGHTS && "Point lights exceeded limits");
 
@@ -76,17 +76,17 @@ void ecs::sys::PointLight::update(ven::FrameInfo& frameInfo,
   ubo.numLights = lightIndex;
 }
 
-void ecs::sys::PointLight::draw(ven::FrameInfo& frameInfo) {
+void ecs::sys::PointLight::draw(ven::FrameInfo &frameInfo) {
   venPipeline->bind(frameInfo.cmdBuffer);
 
   vkCmdBindDescriptorSets(frameInfo.cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                           pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet,
                           0, nullptr);
 
-  for (const auto& ent : m_entities) {
-    auto& transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
-    auto& color = gCoordinator->getComponent<ecs::comp::Color>(ent);
-    auto& pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
+  for (const auto &ent : m_entities) {
+    auto &transform3d = gCoordinator->getComponent<ecs::comp::Transform3D>(ent);
+    auto &color = gCoordinator->getComponent<ecs::comp::Color>(ent);
+    auto &pointLight = gCoordinator->getComponent<ecs::comp::PointLight>(ent);
     ven::PointLightPushConstants push{};
     push.position = glm::vec4(transform3d.translation, 1.0f);
     push.color = glm::vec4(color.color, pointLight.lightIntensity);
